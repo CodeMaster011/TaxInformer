@@ -244,6 +244,8 @@ namespace Tax_Informer
 
         public static HtmlNode AnyChild(HtmlNode parent, string name, Dictionary<string, string> attributeValues, bool ignoreCase = true)
         {
+            if (parent == null) return null;
+
             if (!parent.HasChildNodes) return null;
 
             foreach (var item in parent.ChildNodes)
@@ -271,6 +273,7 @@ namespace Tax_Informer
 
         public static List<HtmlNode> AllChild(HtmlNode parent, string name, Dictionary<string, string> attributeValues, bool ignoreCase = true)
         {
+            if (parent == null) return null;
             if (!parent.HasChildNodes) return null;
 
             List<HtmlNode> list = new List<HtmlNode>();
@@ -361,5 +364,18 @@ namespace Tax_Informer
             }
             return st.Substring(i);
         }
+    }
+    public class SearchAttributeBuilder
+    {
+        private Dictionary<string, string> att = new Dictionary<string, string>();
+
+        public Dictionary<string, string> Build() => att;
+        public SearchAttributeBuilder Add(string attribute, string value)
+        {
+            att.Add(attribute, value);
+            return this;
+        }
+
+        public static SearchAttributeBuilder CreateNew() => new SearchAttributeBuilder();
     }
 }

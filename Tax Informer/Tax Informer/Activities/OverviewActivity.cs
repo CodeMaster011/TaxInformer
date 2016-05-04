@@ -21,8 +21,8 @@ namespace Tax_Informer.Activities
         private ListView listview = null;
         private ListviewAdpater adapter = null;
         private NextPageContext nextPageContext = null;
-
         private string NextPageRequestUids = string.Empty;
+        private OverviewType browsingContext = OverviewType.UNKNOWN;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -34,12 +34,22 @@ namespace Tax_Informer.Activities
 
             //TODO: Create an efficient way to pass information to and from the activity (like, currentWebpage, URL, Author, Category etc.)
 
+            browsingContext = OverviewType.IndexPage;
             analysisModule.ReadIndexPage(UidGenerator(), currentWebsite.IndexPageLink, this);   //make the request
+
 
             listview = FindViewById<ListView>(Resource.Id.contentListView);
             adapter = new ListviewAdpater() { parent = this };
             listview.Adapter = adapter;
-            //TODO: Add on item click listener on listview
+            listview.ItemClick += Listview_ItemClick;
+        }
+
+        private void Listview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            //TODO: Get the selected Overview and convert it to bundle and start an activity with bundle
+            Intent intent = new Intent(this, typeof(ArticalActivity));
+            intent.PutExtra(ArticalActivity.PassArticalOverviewObj, adapter.data[e.Position].ToBundle());
+            StartActivity(intent);
         }
 
         public void ArticalOverviewProcessedCallback(string uid, string url, ArticalOverview[] articalOverviews, OverviewType overviewType, string nextPageUrl)

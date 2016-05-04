@@ -27,7 +27,39 @@ namespace Tax_Informer.Core
             a.Title = Title;
             a.Authors = Authors;
             a.Date = Date;
+            a.Authors = Authors;
             return a;
+        }
+
+        public Category ToCategory(int index)
+        {
+            return new Category()
+            {
+                Name = Title,
+                Link = LinkOfActualArtical
+            };
+        }
+
+        public ArticalOverview() { }
+        public ArticalOverview(Bundle bundle)
+        {
+            Title = bundle.GetString("title");
+            SummaryText = bundle.GetString("summaryText");
+            Date = bundle.GetString("date");
+            LinkOfActualArtical = bundle.GetString("articalLink");
+            //TODO: Read Authors[] and Category[] from bundle
+        }
+
+        public Bundle ToBundle()
+        {
+            //TODO: **Complete the full Conversion of ArticalOverview to bundle
+            Bundle b = new Bundle();
+            b.PutString("title", Title);
+            b.PutString("summaryText", SummaryText);
+            b.PutString("date", Date);
+            b.PutString("articalLink", LinkOfActualArtical);
+            //TODO: Convert Authors[] and Category[] of ArticalOverview to bundle
+            return b;
         }
     }
 }

@@ -16,5 +16,11 @@ namespace Tax_Informer.Core
     {
         public string Name { get; set; } = string.Empty;
         public string Link { get; set; } = string.Empty;
+
+        public Bundle ToBundle()
+        {
+            //TODO: Convert Author to bundle
+            return null;
+        }
     }
 }

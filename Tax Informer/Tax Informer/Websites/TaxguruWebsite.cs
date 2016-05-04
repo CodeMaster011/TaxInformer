@@ -26,7 +26,56 @@ namespace Tax_Informer.Websites
 
         public override Artical ReadArtical(ArticalOverview overview, HtmlDocument doc)
         {
-            throw new NotImplementedException();
+            //TODO: Fix the single cote (') bug in http://taxguru.in/chartered-accountant/hey-examinee-thy-duty-result-thy-concern.html
+            //TODO: Fix bug http://taxguru.in/company-law/download-annual-fillingxbrleforms.html
+
+            var container = Helper.AnyChild(doc.DocumentNode, "div", "latestPosts main-box latestPostsBg");
+            if (container == null) return null;
+
+            var artical = new Artical();
+
+            var aLinkTitle = Helper.AnyChild(Helper.AnyChild(container, "div", "homeTitle margint-10"),"a");
+            artical.Title = HtmlEntity.DeEntitize(aLinkTitle.GetAttributeValue("title", ""));
+
+            var aLinkAuthor = Helper.AnyChild(Helper.AnyChild(container, "li", "postAuthor"), "a");
+            artical.Authors = new Author[] 
+            {
+                new Author()
+                {
+                    Name = aLinkAuthor.InnerText,
+                    Link = aLinkAuthor.GetAttributeValue("href","")
+                }
+            };
+
+            var aLinkDate = Helper.AnyChild(Helper.AnyChild(container, "li", "MetapostDate"), "a");
+            artical.Date = aLinkDate.InnerText;
+
+            var relatedPostContainer = Helper.AnyChild(container, "div", "rp4wp-related-posts rp4wp-related-post");
+            var aLinkRelatedPosts = Helper.AllChild(relatedPostContainer, "a");
+            if (aLinkRelatedPosts != null)
+            {
+                var reletedPost = new List<ArticalOverview>();
+                foreach (var aNode in aLinkRelatedPosts)
+                {
+                    reletedPost.Add(
+                        new ArticalOverview()
+                        {
+                            LinkOfActualArtical = aNode.GetAttributeValue("href", ""),
+                            Title = aNode.InnerText
+                        });
+                }
+                artical.RelatedPosts = reletedPost.ToArray();
+            }
+
+            var articalContainer = Helper.AnyChild(container, "div", "fsize16");
+            if(relatedPostContainer!=null) articalContainer.RemoveChild(relatedPostContainer);
+            //HtmlNode node = HtmlNode.CreateNode("<div></div>");
+            //var pNodes = Helper.AllChild(articalContainer, "p");
+            //foreach (var pNode in pNodes)
+            //    node.AppendChild(pNode);
+            artical.HtmlText = $"<html><body>{ HtmlEntity.DeEntitize(articalContainer.InnerHtml)}</body></html>";
+
+            return artical;
         }
 
         public override ArticalOverview[] ReadAuthor(Author author, HtmlDocument doc, out string nextPageUrl)
