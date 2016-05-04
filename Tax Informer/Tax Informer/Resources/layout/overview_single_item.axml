@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#60b3f6"
+    android:elevation="4dp"
+    android:paddingBottom="5dp">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/linearLayout1"
+        android:elevation="10dp"
+        android:background="#2372b2"
+        android:layout_marginBottom="5dp">
+        <TextView
+            android:text="Tg"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:id="@+id/websiteComicTextView"
+            android:gravity="center"
+            android:textSize="25sp"
+            android:textColor="#ffffff" />
+        <TextView
+            android:text="Who Are the Real Builders Of A Nation?"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/titleTextView"
+            android:gravity="center_vertical"
+            android:textSize="18sp"
+            android:paddingLeft="5dp"
+            android:textColor="#ffffff"
+            android:ellipsize="end"
+            android:maxLines="2" />
+    </LinearLayout>
+    <TextView
+        android:text="No, Not the planners, financiers, engineers, architects, managers. They are one of the inputs in the production process. These groups sit in their posh air-conditioned offices and strain their brain to do their work. Their job involves mental strain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/summaryTextView"
+        android:textSize="10sp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:layout_margin="2dp"
+        android:fadingEdge="vertical"
+        android:textColor="#000000"
+        android:padding="2dp" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/linearLayout3"
+        android:background="#106271"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout2">
+        <TextView
+            android:text="99 WWW, 2016"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/dateTextView"
+            android:layout_weight="1"
+            android:textSize="15sp"
+            android:gravity="left"
+            android:padding="2dp"
+            android:textColor="#000000" />
+        <TextView
+            android:text="By, Author1, Author2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/authorTextView"
+            android:layout_weight="4"
+            android:textSize="15sp"
+            android:gravity="right"
+            android:padding="2dp"
+            android:textColor="#000000" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/linearLayout5"
+        android:background="#106271"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout4">
+        <TextView
+            android:text="CA CS ICWA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tagTextView1"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:layout_margin="2dp"
+            android:elevation="5dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#000000"
+            android:padding="2dp"
+            android:background="#60b3f6" />
+        <TextView
+            android:text="Articles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tagTextView2"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:layout_margin="2dp"
+            android:elevation="5dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#000000"
+            android:padding="2dp"
+            android:background="#60b3f6" />
+        <TextView
+            android:text="Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tagTextView3"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:layout_margin="2dp"
+            android:elevation="5dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:visibility="visible"
+            android:textColor="#000000"
+            android:padding="2dp"
+            android:background="#60b3f6" />
+    </LinearLayout>
+</LinearLayout>

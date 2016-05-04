@@ -1,0 +1,42 @@
+﻿using System;
+using Android.App;
+using Android.Content;
+using Android.Runtime;
+using Android.Views;
+using Android.Widget;
+using Android.OS;
+
+[assembly: Application(Theme = "@android:style/Theme.Material.Light")]
+namespace Tax_Informer
+{
+    
+    [Activity(Label = "Tax_Informer", MainLauncher = true, Icon = "@drawable/icon")]
+    public class MainActivity : Activity
+    {
+        //int count = 1;
+
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+
+            // Set our view from the "main" layout resource
+            SetContentView(Resource.Layout.Main);
+
+            // Get our button from the layout resource,
+            // and attach an event to it
+
+            Button button = FindViewById<Button>(Resource.Id.MyButton);
+
+            button.Click += delegate
+            {
+                MyGlobal.currentWebsite = new Websites.TaxguruWebsite();
+
+                Intent intent = new Intent(this, typeof(Activities.OverviewActivity));
+                StartActivity(intent);
+
+                //button.Text = string.Format("{0} clicks!", count++);
+            };
+        }
+    }
+}
+
