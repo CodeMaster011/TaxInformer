@@ -42,7 +42,7 @@ namespace Tax_Informer.Activities
 
             RunOnUiThread(new Action(() =>
             {
-                webview.LoadData(artical.HtmlText, "text/html", null);
+                webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
                 webview.Settings.DefaultFontSize = 20;
 
                 adapter.NotifyDataSetChanged();
@@ -74,6 +74,7 @@ namespace Tax_Informer.Activities
 
             webview = FindViewById<WebView>(Resource.Id.contentWebView);
             webview.Settings.DefaultFontSize = 20;
+            webview.Settings.BuiltInZoomControls = true;
 
             gridview = FindViewById<GridView>(Resource.Id.relatedPostGridView);
             adapter = new GridviewAdapter() { parent = this };

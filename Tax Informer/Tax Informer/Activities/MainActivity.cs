@@ -6,7 +6,7 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 
-[assembly: Application(Theme = "@android:style/Theme.Material.Light")]
+[assembly: Application(Theme = "@style/MyTheme")]//"@android:style/Theme.Material.Light"
 namespace Tax_Informer
 {
     

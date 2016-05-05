@@ -17,10 +17,10 @@ namespace Tax_Informer.Core
     //TODO: Find a way to localize the currentWebsite into IAnalysisModule
     interface IAnalysisModule
     {
-        void ReadIndexPage(string uid, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler);
-        void ReadArtical(string uid, ArticalOverview overview, IUiArticalResponseHandler responseHandler);
-        void ReadAuthor(string uid, Author author, IUiArticalOverviewResponseHandler responseHandler);
-        void ReadCategory(string uid, Category category, IUiArticalOverviewResponseHandler responseHandler);
+        void ReadIndexPage(string uid, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
+        void ReadArtical(string uid, ArticalOverview overview, IUiArticalResponseHandler responseHandler, bool isForced = false);
+        void ReadAuthor(string uid, Author author, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
+        void ReadCategory(string uid, Category category, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
         void CancleRequest(List<string> UId);
     }
     class AnalysisModule : IAnalysisModule, IResponseHandler
@@ -122,28 +122,28 @@ namespace Tax_Informer.Core
             }
         }
 
-        public void ReadIndexPage(string uid, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler)
+        public void ReadIndexPage(string uid, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, indexPageLink, RequestPacketOwners.AnalysisModule, OverviewType.IndexPage, responseHandler));
+                RequestPacket.CreatePacket(uid, indexPageLink, isForced, RequestPacketOwners.AnalysisModule, OverviewType.IndexPage, responseHandler));
         }
 
-        public void ReadArtical(string uid, ArticalOverview overview, IUiArticalResponseHandler responseHandler)
+        public void ReadArtical(string uid, ArticalOverview overview, IUiArticalResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, overview.LinkOfActualArtical, RequestPacketOwners.AnalysisModule, responseHandler).AddTag(overview));
+                RequestPacket.CreatePacket(uid, overview.LinkOfActualArtical, isForced, RequestPacketOwners.AnalysisModule, responseHandler).AddTag(overview));
         }
 
-        public void ReadAuthor(string uid, Author author, IUiArticalOverviewResponseHandler responseHandler)
+        public void ReadAuthor(string uid, Author author, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, author.Link, RequestPacketOwners.AnalysisModule, OverviewType.Author, responseHandler).AddTag(author));
+                RequestPacket.CreatePacket(uid, author.Link, isForced, RequestPacketOwners.AnalysisModule, OverviewType.Author, responseHandler).AddTag(author));
         }
 
-        public void ReadCategory(string uid, Category category, IUiArticalOverviewResponseHandler responseHandler)
+        public void ReadCategory(string uid, Category category, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, category.Link, RequestPacketOwners.AnalysisModule, OverviewType.Category, responseHandler).AddTag(category));
+                RequestPacket.CreatePacket(uid, category.Link, isForced, RequestPacketOwners.AnalysisModule, OverviewType.Category, responseHandler).AddTag(category));
         }
 
         public AnalysisModule()

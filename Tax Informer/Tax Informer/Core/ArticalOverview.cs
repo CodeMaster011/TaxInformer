@@ -17,6 +17,9 @@ namespace Tax_Informer.Core
         public string Title { get; set; } = string.Empty;
         public string SummaryText { get; set; } = string.Empty;
         public Author[] Authors { get; set; } = null;
+        /// <summary>
+        /// Format : YYYYMMDD
+        /// </summary>
         public string Date { get; set; } = string.Empty; //TODO: Make the type of Date to int for easy comparison of latest post
         public Category[] Categorys { get; set; } = null;
         public string LinkOfActualArtical { get; set; } = string.Empty;

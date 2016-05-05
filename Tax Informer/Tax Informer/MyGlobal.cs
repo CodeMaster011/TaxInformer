@@ -16,6 +16,7 @@ namespace Tax_Informer
     internal static class MyGlobal
     {
         public static Website currentWebsite = null;
+        public static int currentDate = int.Parse(DateTime.Now.ToString("yyyyMMdd"));  //YYYYMMDD
         public static bool IsRunning = true;
         public static int NextPageContentNumber = 5;
         public static IAnalysisModule analysisModule = new AnalysisModule();
@@ -25,5 +26,30 @@ namespace Tax_Informer
 
 
         public static string UidGenerator() => Guid.NewGuid().ToString();
+
+        public static string GetHumanReadableDate(string formatedDate)
+        {
+            var req = int.Parse(formatedDate);
+            var diff = currentDate - req;
+            switch (diff)
+            {
+                case 0:
+                    return "Today";
+                case 1:
+                    return "Yesterday";
+                case 2:
+                    return "2 day ago";
+                case 3:
+                    return "3 day ago";
+                default:
+                    break;
+            }
+            var dd = req % 100;
+            var mm = ((req - dd) / 100) % 100;
+            if (currentDate.ToString().Substring(0, 4) == formatedDate.Substring(0, 4))
+                return Helper.monthArray[mm - 1] + " " + dd.ToString();
+            else
+                return $"{dd} {Helper.monthArray[mm - 1]} {formatedDate.Substring(0, 4)}";
+        }
     }
 }

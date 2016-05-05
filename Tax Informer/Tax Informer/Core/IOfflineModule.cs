@@ -53,7 +53,7 @@ namespace Tax_Informer.Core
                     var reqURL = reqPacket.Url;
 
                     var resultStr = diskCache.GetString(reqURL);
-                    if (resultStr == string.Empty)
+                    if (resultStr == string.Empty || reqPacket.OnlyOnline)
                     {
                         //no data in disk download now
                         onlineModule.RequestData(reqPacket, this);
@@ -81,7 +81,7 @@ namespace Tax_Informer.Core
 
                         var packUrl = responsePacket.Url;
 
-                        if (diskCache.IsKeyExist(packUrl))
+                        if (diskCache.IsKeyExist(packUrl) && !responsePacket.OnlyOnline)
                         {
                             diskCache.Put(packUrl, responsePacket.DataInString, true);
                             responsePacket.Dispose();

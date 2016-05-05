@@ -364,6 +364,18 @@ namespace Tax_Informer
             }
             return st.Substring(i);
         }
+
+        public static string[] monthArray = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+        public static int GetMonthIndex(string month)
+        {
+            string abb = month.Substring(0, 3).ToLower();
+            for (int i = 0; i < monthArray.Length; i++)
+            {
+                if (abb == monthArray[i].ToLower()) return i + 1;
+            }
+            return 0;
+        }
     }
     public class SearchAttributeBuilder
     {

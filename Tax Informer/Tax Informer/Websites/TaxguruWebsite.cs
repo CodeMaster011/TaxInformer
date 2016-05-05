@@ -22,7 +22,61 @@ namespace Tax_Informer.Websites
 
         public override string Name { get; } = "Taxguru";
 
-        public override string Color { get; } = "#e43f4d";
+        public override string Color { get; } = "#E91E63";
+
+        public override Category[] Categories
+        {
+            get
+            {
+                return new Category[]
+                {
+                    new Category()
+                    {
+                        Name ="CA CS ICWA", Link = "http://taxguru.in/category/chartered-accountant/",
+                    },
+                    new Category()
+                    {
+                        Name ="Income Tax", Link = "http://taxguru.in/category/income-tax/",
+                    },
+                    new Category()
+                    {
+                        Name ="Service Tax", Link = "http://taxguru.in/category/service-tax/",
+                    },
+                    new Category()
+                    {
+                        Name ="Company Law", Link = "http://taxguru.in/category/company-law/",
+                    },
+                    new Category()
+                    {
+                        Name ="Excise Duty", Link = "http://taxguru.in/category/excise-duty/",
+                    },
+                    new Category()
+                    {
+                        Name ="Custom Duty", Link = "http://taxguru.in/category/custom-duty/",
+                    },
+                    new Category()
+                    {
+                        Name ="GST", Link = "http://taxguru.in/category/goods-and-service-tax/",
+                    },
+                    new Category()
+                    {
+                        Name ="RBI\\FEMA", Link = "http://taxguru.in/category/rbi/",
+                    },
+                    new Category()
+                    {
+                        Name ="SEBI", Link = "http://taxguru.in/category/sebi/",
+                    },
+                    new Category()
+                    {
+                        Name ="Finance", Link = "http://taxguru.in/category/finance/",
+                    },
+                    new Category()
+                    {
+                        Name ="Corporate Law", Link = "http://taxguru.in/category/corporate-law/",
+                    }
+                };
+            }
+        }
 
         public override Artical ReadArtical(ArticalOverview overview, HtmlDocument doc)
         {
@@ -73,7 +127,7 @@ namespace Tax_Informer.Websites
             //var pNodes = Helper.AllChild(articalContainer, "p");
             //foreach (var pNode in pNodes)
             //    node.AppendChild(pNode);
-            artical.HtmlText = $"<html><body>{ HtmlEntity.DeEntitize(articalContainer.InnerHtml)}</body></html>";
+            artical.HtmlText = $"<html><body>{ articalContainer.InnerHtml}</body></html>";
 
             return artical;
         }
@@ -85,7 +139,7 @@ namespace Tax_Informer.Websites
 
         public override ArticalOverview[] ReadCategory(Category category, HtmlDocument doc, out string nextPageUrl)
         {
-            throw new NotImplementedException();
+            return ReadIndexPage(category.Link, doc, out nextPageUrl);
         }
 
         public override ArticalOverview[] ReadIndexPage(string url, HtmlDocument doc, out string nextPageUrl)
@@ -123,7 +177,7 @@ namespace Tax_Informer.Websites
                 o.Authors = new Author[] { author };
 
                 var aLinkDate = Helper.AnyChild(Helper.AnyChild(oNode, "li", "MetapostDate"), "a", "linkblack");
-                o.Date = aLinkDate.InnerText;
+                o.Date = getFormatedDate(aLinkDate.InnerText);
 
                 var divSummaryNode = Helper.AnyChild(oNode, "div", "fsize16");
                 o.SummaryText = divSummaryNode.InnerText;
@@ -159,6 +213,13 @@ namespace Tax_Informer.Websites
         protected override void RestoreState(Dictionary<string, object> state)
         {
             throw new NotImplementedException();
+        }
+
+        private string getFormatedDate(string rawDate)
+        {
+            var ss = rawDate.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            var month = Helper.GetMonthIndex(ss[1]).ToString("00");
+            return ss[2] + month + ss[0];
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Tax_Informer.Core
         public const string RequestPacketOwner = "owner";
         public const string RequestPacketTag = "tag";
         public const string RequestPacketOverviewType = "overviewType";
+        public const string RequestPacketOnlyOnline = "onlineOnly";
 
         public Dictionary<string, object> requestObjs = null;
 
@@ -193,6 +194,7 @@ namespace Tax_Informer.Core
                     requestObjs.Add(RequestPacketTag, value);
             }
         }
+
         public RequestPacketOwners Owner
         {
             get
@@ -205,6 +207,21 @@ namespace Tax_Informer.Core
                     throw new InvalidOperationException("The data already exist.");
                 else
                     requestObjs.Add(RequestPacketOwner, value);
+            }
+        }
+
+        public bool OnlyOnline
+        {
+            get
+            {
+                return Get<bool>(RequestPacketOnlyOnline);
+            }
+            set
+            {
+                if (requestObjs.ContainsKey(RequestPacketOnlyOnline))
+                    throw new InvalidOperationException("The data already exist.");
+                else
+                    requestObjs.Add(RequestPacketOnlyOnline, value);
             }
         }
 
@@ -251,10 +268,10 @@ namespace Tax_Informer.Core
             //Android.Util.Log.Debug("RequestPacket", $"GC Collected {--MyGlobal.requestPacketCount}");
         }
 
-        public static RequestPacket CreatePacket(string uid, string url, RequestPacketOwners owner, 
+        public static RequestPacket CreatePacket(string uid, string url, bool onlineOnly, RequestPacketOwners owner, 
             IUiArticalResponseHandler analisisModuleResponseUiArtical = null, IResponseHandler offlineModuleResponse = null, IResponseHandler onlineModuleResponse = null)
         {
-            var r = new RequestPacket() { Uid = uid, Url = url, Owner = owner, OverviewType = OverviewType.Null };
+            var r = new RequestPacket() { Uid = uid, Url = url, Owner = owner, OverviewType = OverviewType.Null, OnlyOnline = onlineOnly };
             if (analisisModuleResponseUiArtical != null) r.AnalisisModuleResponseUiArtical = analisisModuleResponseUiArtical;
             if (offlineModuleResponse != null) r.OfflineModuleResponse = offlineModuleResponse;
             if (onlineModuleResponse != null) r.OnlineModuleResponse = onlineModuleResponse;
@@ -264,10 +281,10 @@ namespace Tax_Informer.Core
             return r;
         }
 
-        public static RequestPacket CreatePacket(string uid, string url, RequestPacketOwners owner, OverviewType overviewType,
+        public static RequestPacket CreatePacket(string uid, string url, bool onlineOnly, RequestPacketOwners owner, OverviewType overviewType,
             IUiArticalOverviewResponseHandler analisisModuleResponseUiArticalOverview = null, IResponseHandler offlineModuleResponse = null, IResponseHandler onlineModuleResponse = null)
         {
-            var r = new RequestPacket() { Uid = uid, Url = url, Owner = owner, OverviewType = overviewType };
+            var r = new RequestPacket() { Uid = uid, Url = url, Owner = owner, OverviewType = overviewType, OnlyOnline = onlineOnly };
             if (analisisModuleResponseUiArticalOverview != null) r.AnalisisModuleResponseUiArticalOverview = analisisModuleResponseUiArticalOverview;
             if (offlineModuleResponse != null) r.OfflineModuleResponse = offlineModuleResponse;
             if (onlineModuleResponse != null) r.OnlineModuleResponse = onlineModuleResponse;

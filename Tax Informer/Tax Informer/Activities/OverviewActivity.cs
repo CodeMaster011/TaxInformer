@@ -12,12 +12,23 @@ using Android.Widget;
 using Java.Lang;
 using Tax_Informer.Core;
 using static Tax_Informer.MyGlobal;
+using Android.Support.V4.Widget;
+using Android.Graphics.Drawables;
 
 namespace Tax_Informer.Activities
 {
     [Activity(Label = "OverviewActivity", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     internal class OverviewActivity : Activity, IUiArticalOverviewResponseHandler
     {
+        private DrawerLayout drawerLayout = null;
+        private ArrayAdapter navAdapter = null;
+        private ListView navListview = null;
+        private string[] navData = null;
+
+        private SwipeRefreshLayout swipeRefLayout = null;
+        private string refreshingLink = string.Empty;
+        public string refreshingRequestUid = string.Empty;
+
         private ListView listview = null;
         private ListviewAdpater adapter = null;
         private NextPageContext nextPageContext = null;
@@ -35,13 +46,69 @@ namespace Tax_Informer.Activities
             //TODO: Create an efficient way to pass information to and from the activity (like, currentWebpage, URL, Author, Category etc.)
 
             browsingContext = OverviewType.IndexPage;
-            analysisModule.ReadIndexPage(UidGenerator(), currentWebsite.IndexPageLink, this);   //make the request
+            analysisModule.ReadIndexPage(UidGenerator(), refreshingLink = currentWebsite.IndexPageLink, this);   //make the request
 
+            ActionBar.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.ParseColor(currentWebsite.Color)));
+            Title = currentWebsite.Name;
+
+            swipeRefLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swiperefresh);
+            swipeRefLayout.Refresh += SwipeRefLayout_Refresh;
+            //swipeRefLayout.SetColorSchemeColors(new int[] {
+            //    Android.Graphics.Color.ParseColor("#E91E63").ToArgb(),
+            //    Android.Graphics.Color.ParseColor("#D81B60").ToArgb(),
+            //    Android.Graphics.Color.ParseColor("#880E4F").ToArgb()});
+            swipeRefLayout.SetColorSchemeColors(new int[] {
+                Android.Graphics.Color.ParseColor(currentWebsite.Color).ToArgb()});
+
+            drawerLayout = FindViewById<DrawerLayout>(Resource.Id.overviewDrawerLayout);
+            navListview = FindViewById<ListView>(Resource.Id.navigationDrawerListView);
+            navData = new string[currentWebsite.Categories.Length];
+            int index = 0;
+            foreach (var item in currentWebsite.Categories) navData[index++] = item.Name;
+            navAdapter = new ArrayAdapter(this, Android.Resource.Layout.SimpleListItem1, navData);
+            navListview.Adapter = navAdapter;
+            navListview.ItemClick += NavListview_ItemClick;
 
             listview = FindViewById<ListView>(Resource.Id.contentListView);
             adapter = new ListviewAdpater() { parent = this };
             listview.Adapter = adapter;
             listview.ItemClick += Listview_ItemClick;
+        }
+
+        private void SwipeRefLayout_Refresh(object sender, EventArgs e)
+        {
+            if (refreshingRequestUid != string.Empty) return;
+
+            swipeRefLayout.Refreshing = true;
+            switch (browsingContext)
+            {
+                case OverviewType.Null:
+                    break;
+                case OverviewType.UNKNOWN:
+                    break;
+                case OverviewType.IndexPage:
+                    analysisModule.ReadIndexPage(refreshingRequestUid = UidGenerator(), refreshingLink, this, true);
+                    break;
+                case OverviewType.Author:
+                    break;
+                case OverviewType.Category:
+                    analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), new Category() { Link = refreshingLink }, this);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void NavListview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            browsingContext = OverviewType.Category;
+            var cat = currentWebsite.Categories[e.Position];
+            refreshingLink = cat.Link;
+            Title = $"{cat.Name} - {currentWebsite.Name}";
+            analysisModule.ReadCategory(UidGenerator(), cat, this);
+            adapter.data = null;
+            adapter.NotifyDataSetChanged();
+            drawerLayout.CloseDrawer((int)GravityFlags.Left);
         }
 
         private void Listview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
@@ -70,6 +137,13 @@ namespace Tax_Informer.Activities
             if(nextPageUrl!=null && nextPageUrl != string.Empty)
             {
                 nextPageContext = new NextPageContext() { overviewType = overviewType, url = nextPageUrl }; //save the next page state
+            }
+
+            if(uid == refreshingRequestUid)
+            {
+                newData = null;
+                refreshingRequestUid = string.Empty;
+                RunOnUiThread(new Action(() => { swipeRefLayout.Refreshing = false; }));
             }
 
             adapter.data = newData == null ? articalOverviews : newData;
@@ -145,22 +219,28 @@ namespace Tax_Informer.Activities
                 vHolder.websiteComicTextView.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
                 vHolder.titleTextView.Text = item.Title;
                 vHolder.summaryTextView.Text = item.SummaryText;
-                vHolder.dateTextView.Text = item.Date; //TODO: Convert the data into a human readable format
+                vHolder.dateTextView.Text = GetHumanReadableDate(item.Date);
                 vHolder.authorTextView.Text = "By, " + item.Authors[0].Name; //TODO: Extend support for more author and allow individual author to have their options with onClick listener
+                
 
-
-                for (int i = 0; i < vHolder.tag.Length; i++)
-                {
-                    if (i >= item.Categorys.Length)
-                    {
-                        vHolder.tag[i].Visibility = ViewStates.Gone;
-                    }
-                    else
-                    {
-                        vHolder.tag[i].Visibility = ViewStates.Visible;
-                        vHolder.tag[i].Text = item.Categorys[i].Name;
-                    }                    
-                }
+                //for (int i = 0; i < vHolder.tag.Length; i++)
+                //{
+                //    if (i >= item.Categorys.Length)
+                //    {
+                //        vHolder.tag[i].Visibility = ViewStates.Gone;
+                //    }
+                //    else
+                //    {
+                //        var category = item.Categorys[i];
+                //        vHolder.tag[i].Visibility = ViewStates.Visible;
+                //        vHolder.tag[i].Text = item.Categorys[i].Name;
+                //        //TODO:Find a way to clear the old callbacks and then add the new one
+                //        vHolder.tag[i].Click += new EventHandler((sender, e) =>
+                //        {
+                //            Toast.MakeText(this.parent, $"Tag: {category.Name}", ToastLength.Short).Show();
+                //        });
+                //    }                    
+                //}
 
 
                 if (data.Length - position <= NextPageContentNumber) this.parent.LoadNextPage();    //sent a request to load next page
