@@ -14,6 +14,8 @@ using static Tax_Informer.MyGlobal;
 using Android.Webkit;
 using Java.Lang;
 using Android.Util;
+using Android.Graphics.Drawables;
+using Android.Support.V4.Widget;
 
 namespace Tax_Informer.Activities
 {
@@ -22,9 +24,15 @@ namespace Tax_Informer.Activities
     {
         public const string PassArticalOverviewObj = "articalOverviewObj";
 
-        private WebView webview = null;
+        private DrawerLayout navDrawerLayout = null;
+        private LinearLayout headerLayout = null;
+        private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
+        //private WebView webview = null;
+        private TextView articalContentTextview = null;
         private GridView gridview = null;
         private GridviewAdapter adapter = null;
+
+        private TextView optionOpenInBrowser = null;
 
         public Artical currentArtical = null;
 
@@ -42,14 +50,22 @@ namespace Tax_Informer.Activities
 
             RunOnUiThread(new Action(() =>
             {
-                webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
-                webview.Settings.DefaultFontSize = 20;
+                //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
+                //webview.Settings.DefaultFontSize = 20;
+
+                //articalContentTextview.SetText(Android.Text.Html.FromHtml(artical.HtmlText));
+                articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);
+                articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
                 adapter.NotifyDataSetChanged();
 
-                if (artical.RelatedPosts != null)
-                    gridview.LayoutParameters.Height = artical.RelatedPosts.Length * dpToPx(70);
-            }));            
+                //if (artical.RelatedPosts != null)
+                //    gridview.LayoutParameters.Height = artical.RelatedPosts.Length * dpToPx(70);
+
+                Title = artical.Title;
+                articalDateTextview.Text = GetHumanReadableDate(artical.Date);
+                articalTitleTextview.Text = artical.Title;
+            }));
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -57,6 +73,8 @@ namespace Tax_Informer.Activities
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.artical);
+
+            ActionBar.Hide();
 
             ArticalOverview articalOverview = null;
 
@@ -72,18 +90,48 @@ namespace Tax_Informer.Activities
 
             analysisModule.ReadArtical(UidGenerator(), articalOverview, this);  //make the request
 
-            webview = FindViewById<WebView>(Resource.Id.contentWebView);
-            webview.Settings.DefaultFontSize = 20;
-            webview.Settings.BuiltInZoomControls = true;
+            //webview = FindViewById<WebView>(Resource.Id.contentWebView);
+            //webview.Settings.DefaultFontSize = 20;
+            //webview.Settings.BuiltInZoomControls = true;
+
+            Window window = Window;
+            // clear FLAG_TRANSLUCENT_STATUS flag:
+            window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+            window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+            // finally change the color
+            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
 
             gridview = FindViewById<GridView>(Resource.Id.relatedPostGridView);
             adapter = new GridviewAdapter() { parent = this };
             gridview.Adapter = adapter;
             gridview.ItemClick += Gridview_ItemClick;
+
+            articalContentTextview = FindViewById<TextView>(Resource.Id.articalContentTextView);
+            headerLayout = FindViewById<LinearLayout>(Resource.Id.articalHeaderLinearLayout);
+            articalTitleTextview = FindViewById<TextView>(Resource.Id.articalTitleTextView);
+            articalDateTextview = FindViewById<TextView>(Resource.Id.articalDateTextView);
+            articalWebsiteComicTextview = FindViewById<TextView>(Resource.Id.articalWebsiteComicTextView);
+            articalWebsiteComicTextview.Text = currentWebsite.ComicText;                        
+            headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+
+            navDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.articalDrawerLayout);
+
+            optionOpenInBrowser = FindViewById<TextView>(Resource.Id.articalOptionOpenInBrowserTextView);
+            optionOpenInBrowser.Click += OptionOpenInBrowser_Click;
+        }
+
+        private void OptionOpenInBrowser_Click(object sender, EventArgs e)
+        {
+            navDrawerLayout.CloseDrawer((int)GravityFlags.Right);
+            Intent browserIntent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(currentArtical.MyLink));
+            StartActivity(browserIntent);
         }
 
         private void Gridview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
+            navDrawerLayout.CloseDrawer((int)GravityFlags.Right);
+
             Intent intent = new Intent(this, typeof(ArticalActivity));
             intent.PutExtra(ArticalActivity.PassArticalOverviewObj, currentArtical.RelatedPosts[e.Position].ToBundle());
             StartActivity(intent);
@@ -100,8 +148,6 @@ namespace Tax_Informer.Activities
                 {
                     if (parent?.currentArtical?.RelatedPosts != null)
                         return parent.currentArtical.RelatedPosts.Length;
-                    //if (parent!=null && parent.currentArtical!=null && parent.currentArtical.RelatedPosts != null)
-                    //    return parent.currentArtical.RelatedPosts.Length;
                     return 0;
                 }
             }
@@ -123,14 +169,11 @@ namespace Tax_Informer.Activities
                     var layoutInflator = this.parent.LayoutInflater;
                     convertView = layoutInflator.Inflate(Resource.Layout.artical_relatedpost_single_item, parent, false);
                     convertView.Tag = convertView.FindViewById(Resource.Id.relatedPostTextView);
-                    //convertView.Click += (sender, e) => onClickCallback(position);
                 }
                 var textview = convertView.Tag as TextView;
                 textview.Text = this.parent.currentArtical.RelatedPosts[position].Title;
                 return convertView;
             }
-
-            //private void onClickCallback(int position) => onClick?.Invoke(this, position);
         }
     }
 }

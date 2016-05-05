@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/articalDrawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ScrollView
@@ -8,25 +8,139 @@
         android:minHeight="25px"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/scrollView1">
+        android:id="@+id/articalScrollView"
+        android:background="#ffffff">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/linearLayout8">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:minHeight="25px"
+                android:id="@+id/articalHeaderLinearLayout"
+                android:gravity="center"
+                android:elevation="4dp"
+                android:background="#E91E63">
+                <TextView
+                    android:text="Tg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/articalWebsiteComicTextView"
+                    android:gravity="center"
+                    android:textSize="30sp"
+                    android:textColor="#B2ffffff"
+                    android:lines="1" />
+                <TextView
+                    android:text="Lok Sabha Passes Finance Bill 2016"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/articalTitleTextView"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:maxLines="2"
+                    android:lines="2"
+                    android:textColor="#ffffff" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="60dp"
+                    android:layout_height="3dp"
+                    android:id="@+id/linearLayout10"
+                    android:background="#1A237E" />
+                <TextView
+                    android:text="Jan 27"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/articalDateTextView"
+                    android:gravity="center"
+                    android:textSize="15sp"
+                    android:lines="1"
+                    android:textColor="#7Fffffff" />
+            </LinearLayout>
+            <TextView
+                android:text="Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/articalContentTextView"
+                android:textSize="18sp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textColor="#000000" />
             <WebView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/contentWebView"
-                android:contextClickable="false" />
-            <GridView
-                android:minWidth="25px"
-                android:minHeight="25px"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/relatedPostGridView"
-                android:columnWidth="200dp"
-                android:numColumns="auto_fit" />
+                android:contextClickable="false"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
-</LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:id="@+id/articalNavigationLinearLayout"
+        android:layout_gravity="right|end"
+        android:background="#ffffff">
+        <TextView
+            android:text="Options :"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/articalOptionTextView"
+            android:textSize="25sp"
+            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:lines="2"
+            android:gravity="center"
+            android:textColor="#000000" />
+        <TextView
+            android:text="Open in browser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/articalOptionOpenInBrowserTextView"
+            android:textSize="18sp"
+            android:paddingLeft="15dp"
+            android:paddingStart="15dp"
+            android:lines="2"
+            android:gravity="center"
+            android:textColor="#000000" />
+        <TextView
+            android:text="Make offline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/articalOptionOfflineTextView"
+            android:textSize="18sp"
+            android:paddingLeft="15dp"
+            android:paddingStart="15dp"
+            android:lines="2"
+            android:gravity="center"
+            android:textColor="#000000" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="#AD1457" />
+    <!--Related Posts-->
+        <TextView
+            android:text="Related Posts :"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/articalRelatedPostTextView"
+            android:textSize="18sp"
+            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:textColor="#000000" />
+        <GridView
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/relatedPostGridView"
+            android:columnWidth="240dp"
+            android:numColumns="auto_fit"
+            android:background="#ffffff" />
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>

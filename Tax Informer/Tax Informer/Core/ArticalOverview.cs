@@ -31,6 +31,7 @@ namespace Tax_Informer.Core
             a.Authors = Authors;
             a.Date = Date;
             a.Authors = Authors;
+            a.MyLink = LinkOfActualArtical;
             return a;
         }
 

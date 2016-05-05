@@ -22,7 +22,7 @@ namespace Tax_Informer.Websites
 
         public override string Name { get; } = "Taxguru";
 
-        public override string Color { get; } = "#E91E63";
+        public override string Color { get; } = "#E91E63";  //500
 
         public override Category[] Categories
         {
@@ -86,7 +86,7 @@ namespace Tax_Informer.Websites
             var container = Helper.AnyChild(doc.DocumentNode, "div", "latestPosts main-box latestPostsBg");
             if (container == null) return null;
 
-            var artical = new Artical();
+            var artical = new Artical() { MyLink = overview.LinkOfActualArtical };
 
             var aLinkTitle = Helper.AnyChild(Helper.AnyChild(container, "div", "homeTitle margint-10"),"a");
             artical.Title = HtmlEntity.DeEntitize(aLinkTitle.GetAttributeValue("title", ""));
@@ -102,7 +102,7 @@ namespace Tax_Informer.Websites
             };
 
             var aLinkDate = Helper.AnyChild(Helper.AnyChild(container, "li", "MetapostDate"), "a");
-            artical.Date = aLinkDate.InnerText;
+            artical.Date = getFormatedDate(aLinkDate.InnerText);
 
             var relatedPostContainer = Helper.AnyChild(container, "div", "rp4wp-related-posts rp4wp-related-post");
             var aLinkRelatedPosts = Helper.AllChild(relatedPostContainer, "a");
@@ -120,21 +120,21 @@ namespace Tax_Informer.Websites
                 }
                 artical.RelatedPosts = reletedPost.ToArray();
             }
-
+            
             var articalContainer = Helper.AnyChild(container, "div", "fsize16");
             if(relatedPostContainer!=null) articalContainer.RemoveChild(relatedPostContainer);
             //HtmlNode node = HtmlNode.CreateNode("<div></div>");
             //var pNodes = Helper.AllChild(articalContainer, "p");
             //foreach (var pNode in pNodes)
             //    node.AppendChild(pNode);
-            artical.HtmlText = $"<html><body>{ articalContainer.InnerHtml}</body></html>";
+            artical.HtmlText = $"<html><head><link rel='stylesheet' id='custom-css' href='http://taxguru.in/wp-content/themes/tg4/style.css?ver=4.5.1' type='text/css' media='all' /></head><body>{ articalContainer.InnerHtml}</body></html>";
 
             return artical;
         }
 
         public override ArticalOverview[] ReadAuthor(Author author, HtmlDocument doc, out string nextPageUrl)
         {
-            throw new NotImplementedException();
+            return ReadIndexPage(author.Link, doc, out nextPageUrl);
         }
 
         public override ArticalOverview[] ReadCategory(Category category, HtmlDocument doc, out string nextPageUrl)

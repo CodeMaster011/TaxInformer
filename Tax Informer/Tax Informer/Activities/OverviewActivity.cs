@@ -51,15 +51,20 @@ namespace Tax_Informer.Activities
             ActionBar.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.ParseColor(currentWebsite.Color)));
             Title = currentWebsite.Name;
 
+            Window window = Window;
+            // clear FLAG_TRANSLUCENT_STATUS flag:
+            window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+            window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+            // finally change the color
+            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+
+
             swipeRefLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swiperefresh);
             swipeRefLayout.Refresh += SwipeRefLayout_Refresh;
-            //swipeRefLayout.SetColorSchemeColors(new int[] {
-            //    Android.Graphics.Color.ParseColor("#E91E63").ToArgb(),
-            //    Android.Graphics.Color.ParseColor("#D81B60").ToArgb(),
-            //    Android.Graphics.Color.ParseColor("#880E4F").ToArgb()});
             swipeRefLayout.SetColorSchemeColors(new int[] {
                 Android.Graphics.Color.ParseColor(currentWebsite.Color).ToArgb()});
-
+            
             drawerLayout = FindViewById<DrawerLayout>(Resource.Id.overviewDrawerLayout);
             navListview = FindViewById<ListView>(Resource.Id.navigationDrawerListView);
             navData = new string[currentWebsite.Categories.Length];
