@@ -53,8 +53,7 @@ namespace Tax_Informer.Activities
                 //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
                 //webview.Settings.DefaultFontSize = 20;
 
-                //articalContentTextview.SetText(Android.Text.Html.FromHtml(artical.HtmlText));
-                articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);
+                articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
                 articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
                 adapter.NotifyDataSetChanged();

@@ -29,6 +29,8 @@ namespace Tax_Informer
 
         public static string GetHumanReadableDate(string formatedDate)
         {
+            if (formatedDate == null || formatedDate == string.Empty) return null;
+
             var req = int.Parse(formatedDate);
             var diff = currentDate - req;
             switch (diff)

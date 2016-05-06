@@ -179,44 +179,47 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f080004
 			public const int articalWebsiteComicTextView = 2131230724;
 			
-			// aapt resource value: 0x7f08001e
-			public const int authorTextView = 2131230750;
+			// aapt resource value: 0x7f08001f
+			public const int authorTextView = 2131230751;
 			
-			// aapt resource value: 0x7f080015
-			public const int contentListView = 2131230741;
+			// aapt resource value: 0x7f080012
+			public const int chClubButton = 2131230738;
+			
+			// aapt resource value: 0x7f080016
+			public const int contentListView = 2131230742;
 			
 			// aapt resource value: 0x7f080009
 			public const int contentWebView = 2131230729;
 			
-			// aapt resource value: 0x7f080013
-			public const int content_frame = 2131230739;
+			// aapt resource value: 0x7f080014
+			public const int content_frame = 2131230740;
 			
-			// aapt resource value: 0x7f08001d
-			public const int dateTextView = 2131230749;
+			// aapt resource value: 0x7f08001e
+			public const int dateTextView = 2131230750;
 			
-			// aapt resource value: 0x7f080017
-			public const int linearLayout1 = 2131230743;
+			// aapt resource value: 0x7f080018
+			public const int linearLayout1 = 2131230744;
 			
 			// aapt resource value: 0x7f080006
 			public const int linearLayout10 = 2131230726;
 			
-			// aapt resource value: 0x7f08001c
-			public const int linearLayout2 = 2131230748;
+			// aapt resource value: 0x7f08001d
+			public const int linearLayout2 = 2131230749;
 			
-			// aapt resource value: 0x7f08001a
-			public const int linearLayout3 = 2131230746;
+			// aapt resource value: 0x7f08001b
+			public const int linearLayout3 = 2131230747;
 			
-			// aapt resource value: 0x7f08001f
-			public const int linearLayout4 = 2131230751;
+			// aapt resource value: 0x7f080020
+			public const int linearLayout4 = 2131230752;
 			
 			// aapt resource value: 0x7f080002
 			public const int linearLayout8 = 2131230722;
 			
-			// aapt resource value: 0x7f080016
-			public const int navigationDrawerListView = 2131230742;
+			// aapt resource value: 0x7f080017
+			public const int navigationDrawerListView = 2131230743;
 			
-			// aapt resource value: 0x7f080012
-			public const int overviewDrawerLayout = 2131230738;
+			// aapt resource value: 0x7f080013
+			public const int overviewDrawerLayout = 2131230739;
 			
 			// aapt resource value: 0x7f08000f
 			public const int relatedPostGridView = 2131230735;
@@ -224,26 +227,26 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f080010
 			public const int relatedPostTextView = 2131230736;
 			
-			// aapt resource value: 0x7f08001b
-			public const int summaryTextView = 2131230747;
+			// aapt resource value: 0x7f08001c
+			public const int summaryTextView = 2131230748;
 			
-			// aapt resource value: 0x7f080014
-			public const int swiperefresh = 2131230740;
-			
-			// aapt resource value: 0x7f080020
-			public const int tagTextView1 = 2131230752;
+			// aapt resource value: 0x7f080015
+			public const int swiperefresh = 2131230741;
 			
 			// aapt resource value: 0x7f080021
-			public const int tagTextView2 = 2131230753;
+			public const int tagTextView1 = 2131230753;
 			
 			// aapt resource value: 0x7f080022
-			public const int tagTextView3 = 2131230754;
+			public const int tagTextView2 = 2131230754;
+			
+			// aapt resource value: 0x7f080023
+			public const int tagTextView3 = 2131230755;
+			
+			// aapt resource value: 0x7f08001a
+			public const int titleTextView = 2131230746;
 			
 			// aapt resource value: 0x7f080019
-			public const int titleTextView = 2131230745;
-			
-			// aapt resource value: 0x7f080018
-			public const int websiteComicTextView = 2131230744;
+			public const int websiteComicTextView = 2131230745;
 			
 			static Id()
 			{

@@ -36,6 +36,14 @@ namespace Tax_Informer
 
                 //button.Text = string.Format("{0} clicks!", count++);
             };
+
+            FindViewById<Button>(Resource.Id.chClubButton).Click += delegate
+             {
+                 MyGlobal.currentWebsite = new Websites.CharteredClubWebsite();
+
+                 Intent intent = new Intent(this, typeof(Activities.OverviewActivity));
+                 StartActivity(intent);
+             };
         }
     }
 }
