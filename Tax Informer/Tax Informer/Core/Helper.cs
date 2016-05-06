@@ -354,6 +354,57 @@ namespace Tax_Informer
             return AllChild(parent, name, attritubeValues, true);
         }
 
+        public static List<HtmlNode> AllChild(HtmlNode parent, string name, SearchCritria critria)
+        {
+            var fullResult = AllChild(parent, name);
+            if (fullResult == null) return null;
+
+            var finalResult = new List<HtmlNode>();
+
+            foreach (var item in fullResult)
+            {
+                if (isAttributesSame(item, critria.HasAttributeList))
+                {
+                    if (critria.NotHasAttributeList == null || !isAttributesSame(item, critria.NotHasAttributeList))
+                    {
+                        bool isOk = true;
+                        if (critria.HasChildren != null)
+                        {
+                            foreach (var includedItem in critria.HasChildren)
+                            {
+                                if (AnyChild(item, includedItem.Name, includedItem.Attribute) == null)
+                                {
+                                    isOk = false;
+                                    break;
+                                }
+                            }
+                        }                        
+                        if (isOk)
+                        {
+                            isOk = true;
+                            if (critria.NotHasChildren != null)
+                            {
+                                foreach (var notIncludedItem in critria.NotHasChildren)
+                                {
+                                    if (AnyChild(item, notIncludedItem.Name, notIncludedItem.Attribute) != null)
+                                    {
+                                        isOk = false;
+                                        break;
+                                    }
+                                }
+                            }                            
+                        }
+                        if (isOk)
+                        {
+                            finalResult.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return finalResult;
+        }
+
         public static string TrimToEntry(string st)
         {
             int i = 0;
@@ -377,17 +428,48 @@ namespace Tax_Informer
             return 0;
         }
     }
-    public class SearchAttributeBuilder
+    public class SearchCritriaBuilder
     {
-        private Dictionary<string, string> att = new Dictionary<string, string>();
+        private SearchCritria critria = new SearchCritria();
 
-        public Dictionary<string, string> Build() => att;
-        public SearchAttributeBuilder Add(string attribute, string value)
+        public SearchCritria Build() => critria;
+        public SearchCritriaBuilder AddHasAttribute(string attribute, string value)
         {
-            att.Add(attribute, value);
+            if (critria.HasAttributeList == null) critria.HasAttributeList = new Dictionary<string, string>();
+            critria.HasAttributeList.Add(attribute, value);
+            return this;
+        }
+        public SearchCritriaBuilder AddNotHasAttribute(string attribute, string value)
+        {
+            if (critria.NotHasAttributeList == null) critria.NotHasAttributeList = new Dictionary<string, string>();
+            critria.NotHasAttributeList.Add(attribute, value);
+            return this;
+        }
+        public SearchCritriaBuilder AddHasChild(ChildNode child)
+        {
+            if (critria.HasChildren == null) critria.HasChildren = new List<ChildNode>();
+            critria.HasChildren.Add(child);
+            return this;
+        }
+        public SearchCritriaBuilder AddNotHasChild(ChildNode child)
+        {
+            if (critria.NotHasChildren == null) critria.NotHasChildren = new List<ChildNode>();
+            critria.NotHasChildren.Add(child);
             return this;
         }
 
-        public static SearchAttributeBuilder CreateNew() => new SearchAttributeBuilder();
+        public static SearchCritriaBuilder CreateNew() => new SearchCritriaBuilder();
+    }
+    public sealed class SearchCritria
+    {
+        public Dictionary<string, string> HasAttributeList = null;
+        public Dictionary<string, string> NotHasAttributeList = null;
+        public List<ChildNode> HasChildren = null;
+        public List<ChildNode> NotHasChildren = null;
+    }
+    public sealed class ChildNode
+    {
+        public string Name { get; set; } = null;
+        public Dictionary<string, string> Attribute { get; set; } = null;
     }
 }

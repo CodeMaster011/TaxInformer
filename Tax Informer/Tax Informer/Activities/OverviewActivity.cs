@@ -224,9 +224,18 @@ namespace Tax_Informer.Activities
                 vHolder.websiteComicTextView.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
                 vHolder.titleTextView.Text = item.Title;
                 vHolder.summaryTextView.Text = item.SummaryText;
+
                 vHolder.dateTextView.Text = GetHumanReadableDate(item.Date);
-                vHolder.authorTextView.Text = "By, " + item.Authors[0].Name; //TODO: Extend support for more author and allow individual author to have their options with onClick listener
-                
+                if (vHolder.dateTextView.Text == null) vHolder.dateTextView.Visibility = ViewStates.Gone;
+                else vHolder.dateTextView.Visibility = ViewStates.Visible;
+
+                if (item?.Authors != null)
+                {
+                    vHolder.authorTextView.Text = "By, " + item.Authors[0].Name;//TODO: Extend support for more author and allow individual author to have their options with onClick listener
+                    vHolder.authorTextView.Visibility = ViewStates.Visible;
+                }
+                else vHolder.authorTextView.Visibility = ViewStates.Gone;                
+
 
                 //for (int i = 0; i < vHolder.tag.Length; i++)
                 //{

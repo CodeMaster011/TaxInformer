@@ -22,13 +22,13 @@ namespace Tax_Informer.Core
         public abstract string IndexPageLink { get; }
         public abstract string Color { get; }
         public virtual Category[] Categories { get; } = null;
+        public virtual bool IsSearchable { get; } = false;
 
         protected void UpdateState(Dictionary<string, object> state)
         {
             if (stateHolder == null) stateHolder = new Stack<Dictionary<string, object>>();
             stateHolder.Push(state);
         }
-
         public bool RestoreState()
         {
             if (stateHolder?.Count > 0)
@@ -39,9 +39,14 @@ namespace Tax_Informer.Core
             return false;
         }
 
-        protected abstract void RestoreState(Dictionary<string, object> state);
+        protected virtual string GetSearchUrl(string keyword) => null;
+        public virtual ArticalOverview[] GetSearchResult(string searchUrl, out string nextPageUrl)
+        {
+            nextPageUrl = null;
+            return null;
+        }
 
-
+        protected abstract void RestoreState(Dictionary<string, object> state);        
         public abstract ArticalOverview[] ReadIndexPage(string url, HtmlAgilityPack.HtmlDocument doc, out string nextPageUrl);
         public abstract Artical ReadArtical(ArticalOverview overview, HtmlAgilityPack.HtmlDocument doc);
         public abstract ArticalOverview[] ReadAuthor(Author author, HtmlAgilityPack.HtmlDocument doc, out string nextPageUrl);

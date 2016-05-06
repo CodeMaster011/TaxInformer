@@ -8,7 +8,12 @@
         android:id="@+id/MyButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Hello" />
+        android:text="Taxguru" />
+    <Button
+        android:text="CharteredClub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/chClubButton" />
     <android.support.v7.widget.CardView
         android:layout_width="fill_parent"
         android:layout_height="245dp"
