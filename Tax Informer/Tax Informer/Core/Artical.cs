@@ -19,7 +19,7 @@ namespace Tax_Informer.Core
         /// <summary>
         /// Format: YYYYMMDD
         /// </summary>
-        public string Date { get; set; } = string.Empty;//TODO: Make the type of Date to int for easy comparison of latest post
+        public string Date { get; set; } = string.Empty;
         public string HtmlText { get; set; } = string.Empty;
         public ArticalOverview[] RelatedPosts { get; set; } = null;
         public string MyLink { get; set; } = string.Empty;
