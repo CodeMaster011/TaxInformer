@@ -64,6 +64,7 @@
     <Compile Include="Activities\ArticalActivity.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\OverviewActivity.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Core\Artical.cs" />
     <Compile Include="Core\ArticalOverview.cs" />
     <Compile Include="Core\Author.cs" />

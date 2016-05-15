@@ -22,9 +22,10 @@ namespace Tax_Informer.Activities
     [Activity(Label = "ArticalActivity")]
     internal class ArticalActivity : Activity, IUiArticalResponseHandler
     {
-        public const string PassArticalOverviewObj = "articalOverviewObj";
-        public const string PassWebsiteInformationObj = "websiteInforamtion";
+        public const string PassArticalOverviewObj = nameof(PassArticalOverviewObj);
+        public const string PassWebsiteKey = nameof(PassWebsiteKey);
 
+        private string currentWebsiteKey = null;
         private DrawerLayout navDrawerLayout = null;
         private LinearLayout headerLayout = null;
         private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
@@ -76,8 +77,8 @@ namespace Tax_Informer.Activities
             ActionBar.Hide();
 
             ArticalOverview articalOverview = null;
-            WebsitePortableInformation currentWebsitePortableInfo = null;
             Bundle extras = Intent.Extras;
+            Website currentWebsite = null;
 
             if (extras != null && extras.ContainsKey(PassArticalOverviewObj))
                 articalOverview = new ArticalOverview(extras.GetBundle(PassArticalOverviewObj));
@@ -86,12 +87,18 @@ namespace Tax_Informer.Activities
                 Finish();
                 return;
             }
+            if (extras != null || extras.ContainsKey(PassWebsiteKey))
+                currentWebsiteKey = extras.GetString(PassWebsiteKey);
+            else
+            {
+                Finish();
+                return;
+            }
 
-            analysisModule.ReadArtical(UidGenerator(), articalOverview, this);  //make the request
+            analysisModule.ReadArtical(UidGenerator(), currentWebsiteKey, articalOverview, this);  //make the request
 
-            if (extras != null || extras.ContainsKey(PassWebsiteInformationObj))            
-                currentWebsitePortableInfo = WebsitePortableInformation.FromBundle(extras.GetBundle(PassWebsiteInformationObj));
-            
+
+            currentWebsite = Config.GetWebsite(currentWebsiteKey);
 
             //webview = FindViewById<WebView>(Resource.Id.contentWebView);
             //webview.Settings.DefaultFontSize = 20;
@@ -103,7 +110,7 @@ namespace Tax_Informer.Activities
             // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
             window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
             // finally change the color
-            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsitePortableInfo.Color));
+            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
 
             gridview = FindViewById<GridView>(Resource.Id.relatedPostGridView);
             adapter = new GridviewAdapter() { parent = this };
@@ -116,11 +123,11 @@ namespace Tax_Informer.Activities
             articalDateTextview = FindViewById<TextView>(Resource.Id.articalDateTextView);
             articalWebsiteComicTextview = FindViewById<TextView>(Resource.Id.articalWebsiteComicTextView);
             
-            headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsitePortableInfo.Color));
+            headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
 
             articalTitleTextview.Text = articalOverview.Title;
             articalDateTextview.Text = GetHumanReadableDate(articalOverview.Date);
-            articalWebsiteComicTextview.Text = currentWebsitePortableInfo.ComicText;
+            articalWebsiteComicTextview.Text = currentWebsite.ComicText;
             articalContentTextview.Text = "Loading...";
             articalContentTextview.Gravity = GravityFlags.CenterHorizontal;
 

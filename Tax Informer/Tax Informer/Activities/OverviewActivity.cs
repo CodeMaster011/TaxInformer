@@ -20,6 +20,10 @@ namespace Tax_Informer.Activities
     [Activity(Label = "OverviewActivity", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
     internal class OverviewActivity : Activity, IUiArticalOverviewResponseHandler
     {
+        public const string PassWebsiteKey = nameof(PassWebsiteKey);
+
+        private Website currentWebsite = null;
+        private string currentWebsiteKey = null;
         private DrawerLayout drawerLayout = null;
         private ArrayAdapter navAdapter = null;
         private ListView navListview = null;
@@ -43,10 +47,12 @@ namespace Tax_Informer.Activities
 
             //ActionBar.Hide();
 
-            //TODO: Create an efficient way to pass information to and from the activity (like, currentWebpage, URL, Author, Category etc.)
+            if (Intent.Extras != null && Intent.Extras.ContainsKey(PassWebsiteKey))
+                currentWebsite = Config.GetWebsite(currentWebsiteKey = Intent.Extras.GetString(PassWebsiteKey));
+            
 
             browsingContext = OverviewType.IndexPage;
-            analysisModule.ReadIndexPage(UidGenerator(), refreshingLink = currentWebsite.IndexPageLink, this);   //make the request
+            analysisModule.ReadIndexPage(UidGenerator(), currentWebsiteKey, refreshingLink = currentWebsite.IndexPageLink, this);   //make the request
 
             ActionBar.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.ParseColor(currentWebsite.Color)));
             Title = currentWebsite.Name;
@@ -75,7 +81,7 @@ namespace Tax_Informer.Activities
             navListview.ItemClick += NavListview_ItemClick;
 
             listview = FindViewById<ListView>(Resource.Id.contentListView);
-            adapter = new ListviewAdpater() { parent = this };
+            adapter = new ListviewAdpater() { parent = this, currentWebsite = currentWebsite };
             listview.Adapter = adapter;
             listview.ItemClick += Listview_ItemClick;
         }
@@ -98,12 +104,12 @@ namespace Tax_Informer.Activities
                 case OverviewType.UNKNOWN:
                     break;
                 case OverviewType.IndexPage:
-                    analysisModule.ReadIndexPage(refreshingRequestUid = UidGenerator(), refreshingLink, this, true);
+                    analysisModule.ReadIndexPage(refreshingRequestUid = UidGenerator(), currentWebsiteKey, refreshingLink, this, true);
                     break;
                 case OverviewType.Author:
                     break;
                 case OverviewType.Category:
-                    analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), new Category() { Link = refreshingLink }, this);
+                    analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), currentWebsiteKey, new Category() { Link = refreshingLink }, this);
                     break;
                 default:
                     break;
@@ -116,7 +122,7 @@ namespace Tax_Informer.Activities
             var cat = currentWebsite.Categories[e.Position];
             refreshingLink = cat.Link;
             Title = $"{cat.Name} - {currentWebsite.Name}";
-            analysisModule.ReadCategory(UidGenerator(), cat, this);
+            analysisModule.ReadCategory(UidGenerator(), currentWebsiteKey, cat, this);
             adapter.data = null;
             adapter.NotifyDataSetChanged();
             drawerLayout.CloseDrawer((int)GravityFlags.Left);
@@ -128,7 +134,7 @@ namespace Tax_Informer.Activities
             database.UpdateIsSeen(UidGenerator(), articalOverview);//add to seen list
             Intent intent = new Intent(this, typeof(ArticalActivity));
             intent.PutExtra(ArticalActivity.PassArticalOverviewObj, articalOverview.ToBundle());
-            intent.PutExtra(ArticalActivity.PassWebsiteInformationObj, WebsitePortableInformation.FromWebsite(currentWebsite).ToBundle());
+            intent.PutExtra(ArticalActivity.PassWebsiteKey, currentWebsiteKey);
             StartActivity(intent);
         }
 
@@ -182,13 +188,13 @@ namespace Tax_Informer.Activities
                 case OverviewType.UNKNOWN:
                     break;
                 case OverviewType.IndexPage:
-                    analysisModule.ReadIndexPage(uid, nextPageContext.url, this);
+                    analysisModule.ReadIndexPage(uid, currentWebsiteKey, nextPageContext.url, this);
                     break;
                 case OverviewType.Author:
-                    analysisModule.ReadAuthor(uid, obj as Author, this);
+                    analysisModule.ReadAuthor(uid, currentWebsiteKey, obj as Author, this);
                     break;
                 case OverviewType.Category:
-                    analysisModule.ReadCategory(uid, obj as Category, this);
+                    analysisModule.ReadCategory(uid, currentWebsiteKey, obj as Category, this);
                     break;
                 default:
                     break;
@@ -199,6 +205,7 @@ namespace Tax_Informer.Activities
         {
             public ArticalOverview[] data { get; set; } = null;
             public OverviewActivity parent { get; set; } = null;
+            public Website currentWebsite { get; set; } = null;
 
             public override int Count
             {

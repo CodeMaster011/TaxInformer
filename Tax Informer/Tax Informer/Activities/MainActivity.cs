@@ -29,9 +29,9 @@ namespace Tax_Informer
 
             button.Click += delegate
             {
-                MyGlobal.currentWebsite = new Websites.TaxguruWebsite();
 
                 Intent intent = new Intent(this, typeof(Activities.OverviewActivity));
+                intent.PutExtra(Activities.OverviewActivity.PassWebsiteKey, "taxguru");
                 StartActivity(intent);
 
                 //button.Text = string.Format("{0} clicks!", count++);
@@ -39,9 +39,9 @@ namespace Tax_Informer
 
             FindViewById<Button>(Resource.Id.chClubButton).Click += delegate
              {
-                 MyGlobal.currentWebsite = new Websites.CharteredClubWebsite();
 
                  Intent intent = new Intent(this, typeof(Activities.OverviewActivity));
+                 intent.PutExtra(Activities.OverviewActivity.PassWebsiteKey, "charteredClub");
                  StartActivity(intent);
              };
         }

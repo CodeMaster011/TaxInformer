@@ -17,10 +17,10 @@ namespace Tax_Informer.Core
     //TODO: Find a way to localize the currentWebsite into IAnalysisModule
     interface IAnalysisModule
     {
-        void ReadIndexPage(string uid, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
-        void ReadArtical(string uid, ArticalOverview overview, IUiArticalResponseHandler responseHandler, bool isForced = false);
-        void ReadAuthor(string uid, Author author, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
-        void ReadCategory(string uid, Category category, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
+        void ReadIndexPage(string uid, string websiteKey, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
+        void ReadArtical(string uid, string websiteKey, ArticalOverview overview, IUiArticalResponseHandler responseHandler, bool isForced = false);
+        void ReadAuthor(string uid, string websiteKey, Author author, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
+        void ReadCategory(string uid, string websiteKey, Category category, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false);
         void CancleRequest(List<string> UId);
     }
     class AnalysisModule : IAnalysisModule, IResponseHandler
@@ -53,6 +53,8 @@ namespace Tax_Informer.Core
             var data = packet.DataInString;
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(data);
+
+            var currentWebsite = Config.GetWebsite(packet.WebsiteKey);
 
             var overviewType = packet.OverviewType;
             if(overviewType == OverviewType.Null)
@@ -122,28 +124,28 @@ namespace Tax_Informer.Core
             }
         }
 
-        public void ReadIndexPage(string uid, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
+        public void ReadIndexPage(string uid, string websiteKey, string indexPageLink, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, indexPageLink, isForced, RequestPacketOwners.AnalysisModule, OverviewType.IndexPage, responseHandler));
+                RequestPacket.CreatePacket(uid, websiteKey, indexPageLink, isForced, RequestPacketOwners.AnalysisModule, OverviewType.IndexPage, responseHandler));
         }
 
-        public void ReadArtical(string uid, ArticalOverview overview, IUiArticalResponseHandler responseHandler, bool isForced = false)
+        public void ReadArtical(string uid, string websiteKey, ArticalOverview overview, IUiArticalResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, overview.LinkOfActualArtical, isForced, RequestPacketOwners.AnalysisModule, responseHandler).AddTag(overview));
+                RequestPacket.CreatePacket(uid, websiteKey, overview.LinkOfActualArtical, isForced, RequestPacketOwners.AnalysisModule, responseHandler).AddTag(overview));
         }
 
-        public void ReadAuthor(string uid, Author author, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
+        public void ReadAuthor(string uid, string websiteKey, Author author, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, author.Link, isForced, RequestPacketOwners.AnalysisModule, OverviewType.Author, responseHandler).AddTag(author));
+                RequestPacket.CreatePacket(uid, websiteKey, author.Link, isForced, RequestPacketOwners.AnalysisModule, OverviewType.Author, responseHandler).AddTag(author));
         }
 
-        public void ReadCategory(string uid, Category category, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
+        public void ReadCategory(string uid, string websiteKey, Category category, IUiArticalOverviewResponseHandler responseHandler, bool isForced = false)
         {
             pendingRequest.Enqueue(
-                RequestPacket.CreatePacket(uid, category.Link, isForced, RequestPacketOwners.AnalysisModule, OverviewType.Category, responseHandler).AddTag(category));
+                RequestPacket.CreatePacket(uid, websiteKey, category.Link, isForced, RequestPacketOwners.AnalysisModule, OverviewType.Category, responseHandler).AddTag(category));
         }
 
         public AnalysisModule()

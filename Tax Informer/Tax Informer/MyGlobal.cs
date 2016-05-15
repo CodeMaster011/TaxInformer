@@ -15,7 +15,6 @@ namespace Tax_Informer
 {
     internal static class MyGlobal
     {
-        public static Website currentWebsite = null;
         public static int currentDate = int.Parse(DateTime.Now.ToString("yyyyMMdd"));  //YYYYMMDD
         public static bool IsRunning = true;
         public static int NextPageContentNumber = 5;
