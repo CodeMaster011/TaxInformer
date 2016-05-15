@@ -23,7 +23,8 @@ namespace Tax_Informer.Activities
     internal class ArticalActivity : Activity, IUiArticalResponseHandler
     {
         public const string PassArticalOverviewObj = "articalOverviewObj";
-        
+        public const string PassWebsiteInformationObj = "websiteInforamtion";
+
         private DrawerLayout navDrawerLayout = null;
         private LinearLayout headerLayout = null;
         private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
@@ -51,7 +52,7 @@ namespace Tax_Informer.Activities
             {
                 //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
                 //webview.Settings.DefaultFontSize = 20;
-
+                articalContentTextview.Gravity = GravityFlags.Left;
                 articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
                 articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
@@ -75,7 +76,7 @@ namespace Tax_Informer.Activities
             ActionBar.Hide();
 
             ArticalOverview articalOverview = null;
-
+            WebsitePortableInformation currentWebsitePortableInfo = null;
             Bundle extras = Intent.Extras;
 
             if (extras != null && extras.ContainsKey(PassArticalOverviewObj))
@@ -88,6 +89,10 @@ namespace Tax_Informer.Activities
 
             analysisModule.ReadArtical(UidGenerator(), articalOverview, this);  //make the request
 
+            if (extras != null || extras.ContainsKey(PassWebsiteInformationObj))            
+                currentWebsitePortableInfo = WebsitePortableInformation.FromBundle(extras.GetBundle(PassWebsiteInformationObj));
+            
+
             //webview = FindViewById<WebView>(Resource.Id.contentWebView);
             //webview.Settings.DefaultFontSize = 20;
             //webview.Settings.BuiltInZoomControls = true;
@@ -98,7 +103,7 @@ namespace Tax_Informer.Activities
             // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
             window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
             // finally change the color
-            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsitePortableInfo.Color));
 
             gridview = FindViewById<GridView>(Resource.Id.relatedPostGridView);
             adapter = new GridviewAdapter() { parent = this };
@@ -110,8 +115,14 @@ namespace Tax_Informer.Activities
             articalTitleTextview = FindViewById<TextView>(Resource.Id.articalTitleTextView);
             articalDateTextview = FindViewById<TextView>(Resource.Id.articalDateTextView);
             articalWebsiteComicTextview = FindViewById<TextView>(Resource.Id.articalWebsiteComicTextView);
-            articalWebsiteComicTextview.Text = currentWebsite.ComicText;                        
-            headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+            
+            headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsitePortableInfo.Color));
+
+            articalTitleTextview.Text = articalOverview.Title;
+            articalDateTextview.Text = GetHumanReadableDate(articalOverview.Date);
+            articalWebsiteComicTextview.Text = currentWebsitePortableInfo.ComicText;
+            articalContentTextview.Text = "Loading...";
+            articalContentTextview.Gravity = GravityFlags.CenterHorizontal;
 
             navDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.articalDrawerLayout);
 

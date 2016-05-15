@@ -25,7 +25,7 @@
                 android:elevation="4dp"
                 android:background="#E91E63">
                 <TextView
-                    android:text="Tg"
+                    android:text="--"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/articalWebsiteComicTextView"
@@ -34,7 +34,7 @@
                     android:textColor="#B2ffffff"
                     android:lines="1" />
                 <TextView
-                    android:text="Lok Sabha Passes Finance Bill 2016"
+                    android:text="--------------"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/articalTitleTextView"
@@ -50,7 +50,7 @@
                     android:id="@+id/linearLayout10"
                     android:background="#1A237E" />
                 <TextView
-                    android:text="Jan 27"
+                    android:text="-----"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/articalDateTextView"
@@ -60,7 +60,7 @@
                     android:textColor="#7Fffffff" />
             </LinearLayout>
             <TextView
-                android:text="Text"
+                android:text="--------------------------------------------------"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/articalContentTextView"

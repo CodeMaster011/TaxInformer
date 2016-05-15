@@ -25,7 +25,7 @@ namespace Tax_Informer.Core
         void UpdateIsSeen(string trasactionId, ArticalOverview articalOverview);
         void Close();
     }
-    class DatabaseModule : IDatabaseModule
+    internal class DatabaseModule : IDatabaseModule
     {
         public string DatabaseFilePath { get; } = null;
         public Context Context { get; set; } = null;
@@ -233,6 +233,10 @@ namespace Tax_Informer.Core
             public string HtmlText { get; set; } = string.Empty;
             public int IsOfflineAvailable { get; set; } = -1;
             public string SeenOn { get; set; } = null;
+            public string WebsiteName { get; }
+            public string WebsiteComicText { get; }
+            public string WebsiteIndexPageLink { get; }
+            public string WebsiteColor { get; }
             //TODO: Implement the mirror of Artical + ArticalOverview to support linear DB
         }
     }

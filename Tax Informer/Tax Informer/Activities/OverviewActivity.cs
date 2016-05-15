@@ -128,6 +128,7 @@ namespace Tax_Informer.Activities
             database.UpdateIsSeen(UidGenerator(), articalOverview);//add to seen list
             Intent intent = new Intent(this, typeof(ArticalActivity));
             intent.PutExtra(ArticalActivity.PassArticalOverviewObj, articalOverview.ToBundle());
+            intent.PutExtra(ArticalActivity.PassWebsiteInformationObj, WebsitePortableInformation.FromWebsite(currentWebsite).ToBundle());
             StartActivity(intent);
         }
 
