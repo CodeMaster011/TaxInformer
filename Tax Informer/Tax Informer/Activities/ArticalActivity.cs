@@ -23,7 +23,7 @@ namespace Tax_Informer.Activities
     internal class ArticalActivity : Activity, IUiArticalResponseHandler
     {
         public const string PassArticalOverviewObj = "articalOverviewObj";
-
+        
         private DrawerLayout navDrawerLayout = null;
         private LinearLayout headerLayout = null;
         private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
@@ -45,7 +45,6 @@ namespace Tax_Informer.Activities
 
         public void ArticalProcessedCallback(string uid, string url, Artical artical)
         {
-            //TODO: Handle the callback response of artical
             currentArtical = artical;//cache the data
 
             RunOnUiThread(new Action(() =>

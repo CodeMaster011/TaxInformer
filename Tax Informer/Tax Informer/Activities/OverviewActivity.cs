@@ -79,6 +79,12 @@ namespace Tax_Informer.Activities
             listview.Adapter = adapter;
             listview.ItemClick += Listview_ItemClick;
         }
+        protected override void OnResume()
+        {            
+            adapter.NotifyDataSetChanged();
+
+            base.OnResume();
+        }
 
         private void SwipeRefLayout_Refresh(object sender, EventArgs e)
         {
@@ -118,9 +124,10 @@ namespace Tax_Informer.Activities
 
         private void Listview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            //TODO: Get the selected Overview and convert it to bundle and start an activity with bundle
+            var articalOverview = adapter.data[e.Position];
+            database.UpdateIsSeen(UidGenerator(), articalOverview);//add to seen list
             Intent intent = new Intent(this, typeof(ArticalActivity));
-            intent.PutExtra(ArticalActivity.PassArticalOverviewObj, adapter.data[e.Position].ToBundle());
+            intent.PutExtra(ArticalActivity.PassArticalOverviewObj, articalOverview.ToBundle());
             StartActivity(intent);
         }
 
@@ -152,6 +159,7 @@ namespace Tax_Informer.Activities
             }
 
             adapter.data = newData == null ? articalOverviews : newData;
+            database.IsSeen(UidGenerator(), adapter.data);  //request a filter from DB
             RunOnUiThread(responseUpdate);
         }
         private void responseUpdate()
@@ -234,8 +242,12 @@ namespace Tax_Informer.Activities
                     vHolder.authorTextView.Text = "By, " + item.Authors[0].Name;//TODO: Extend support for more author and allow individual author to have their options with onClick listener
                     vHolder.authorTextView.Visibility = ViewStates.Visible;
                 }
-                else vHolder.authorTextView.Visibility = ViewStates.Gone;                
+                else vHolder.authorTextView.Visibility = ViewStates.Gone;
 
+                if(item.IsDatabaseConfirmed_SeenOn && !string.IsNullOrEmpty(item.SeenOn))
+                    vHolder.titleTextView.Alpha = 0.2f;
+                else
+                    vHolder.titleTextView.Alpha = 1f;
 
                 //for (int i = 0; i < vHolder.tag.Length; i++)
                 //{

@@ -45,6 +45,11 @@ namespace Tax_Informer
                  StartActivity(intent);
              };
         }
+        public override void OnBackPressed()
+        {
+            MyGlobal.database.Close();
+            base.OnBackPressed();
+        }
     }
 }
 

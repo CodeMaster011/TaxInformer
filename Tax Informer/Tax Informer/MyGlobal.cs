@@ -23,7 +23,7 @@ namespace Tax_Informer
         public static IOfflineModule offlineModule = new OfflineModule();
         public static IOnlineModule onlineModule = new OnlineModule();
         public static ICache diskCache = new DiskCache(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/TaxInformer/Cache", 0);
-
+        public static IDatabaseModule database = new DatabaseModule(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/TaxInformer/database.db");
 
         public static string UidGenerator() => Guid.NewGuid().ToString();
 
