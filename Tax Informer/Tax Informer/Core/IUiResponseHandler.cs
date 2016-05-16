@@ -21,4 +21,8 @@ namespace Tax_Informer.Core
     {
         void ArticalProcessedCallback(string uid, string url, Artical artical);
     }
+    interface IUiOfflineArticalOverviewResponseHandler
+    {
+        void OfflineArticalOverviewProcessedCallback(string transactionId, ArticalOverviewOffline[] articalOverviews);
+    }
 }

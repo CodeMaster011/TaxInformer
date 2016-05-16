@@ -1,83 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/articalDrawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ScrollView
-        android:minWidth="25px"
-        android:minHeight="25px"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/articalScrollView"
-        android:background="#ffffff">
-        <LinearLayout
-            android:orientation="vertical"
+        android:layout_height="match_parent">
+        <com.refractored.fab.ObservableScrollView
+            android:minWidth="25px"
+            android:minHeight="25px"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/linearLayout8">
+            android:id="@+id/articalScrollView"
+            android:background="#ffffff">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:minHeight="25px"
-                android:id="@+id/articalHeaderLinearLayout"
-                android:gravity="center"
-                android:elevation="4dp"
-                android:background="#E91E63">
-                <TextView
-                    android:text="--"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/articalWebsiteComicTextView"
-                    android:gravity="center"
-                    android:textSize="30sp"
-                    android:textColor="#B2ffffff"
-                    android:lines="1" />
-                <TextView
-                    android:text="--------------"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/articalTitleTextView"
-                    android:gravity="center"
-                    android:textSize="18sp"
-                    android:maxLines="2"
-                    android:lines="2"
-                    android:textColor="#ffffff" />
+                android:layout_height="match_parent"
+                android:id="@+id/linearLayout8">
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="60dp"
-                    android:layout_height="3dp"
-                    android:id="@+id/linearLayout10"
-                    android:background="#1A237E" />
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:minHeight="25px"
+                    android:id="@+id/articalHeaderLinearLayout"
+                    android:gravity="center"
+                    android:elevation="4dp"
+                    android:background="#E91E63">
+                    <TextView
+                        android:text="--"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/articalWebsiteComicTextView"
+                        android:gravity="center"
+                        android:textSize="30sp"
+                        android:textColor="#B2ffffff"
+                        android:lines="1" />
+                    <TextView
+                        android:text="--------------"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/articalTitleTextView"
+                        android:gravity="center"
+                        android:textSize="18sp"
+                        android:maxLines="2"
+                        android:lines="2"
+                        android:textColor="#ffffff" />
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="60dp"
+                        android:layout_height="3dp"
+                        android:id="@+id/linearLayout10"
+                        android:background="#1A237E" />
+                    <TextView
+                        android:text="-----"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/articalDateTextView"
+                        android:gravity="center"
+                        android:textSize="15sp"
+                        android:lines="1"
+                        android:textColor="#7Fffffff" />
+                </LinearLayout>
                 <TextView
-                    android:text="-----"
+                    android:text="--------------------------------------------------"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/articalDateTextView"
-                    android:gravity="center"
-                    android:textSize="15sp"
-                    android:lines="1"
-                    android:textColor="#7Fffffff" />
+                    android:id="@+id/articalContentTextView"
+                    android:textSize="18sp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textColor="#000000" />
             </LinearLayout>
-            <TextView
-                android:text="--------------------------------------------------"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/articalContentTextView"
-                android:textSize="18sp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textColor="#000000" />
-            <WebView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/contentWebView"
-                android:contextClickable="false"
-                android:visibility="gone" />
-        </LinearLayout>
-    </ScrollView>
+        </com.refractored.fab.ObservableScrollView>
+        <com.refractored.fab.FloatingActionButton
+            android:id="@+id/articalFab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:enabled="true"
+            android:src="@drawable/fab_download_icon"
+            fab:fab_colorNormal="#c01b67"
+            fab:fab_colorPressed="#8d124b"
+            fab:fab_colorRipple="#740639" />
+    </android.support.design.widget.CoordinatorLayout>
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="240dp"

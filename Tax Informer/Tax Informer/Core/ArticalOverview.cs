@@ -13,7 +13,7 @@ using Android.Widget;
 namespace Tax_Informer.Core
 {
     //TODO: Website type name is not stored into ArticalOverview
-    internal sealed class ArticalOverview
+    internal class ArticalOverview
     {
         public string Title { get; set; } = string.Empty;
         public string SummaryText { get; set; } = string.Empty;
@@ -25,7 +25,7 @@ namespace Tax_Informer.Core
         public Category[] Categorys { get; set; } = null;
         public string LinkOfActualArtical { get; set; } = string.Empty;
 
-        public bool IsOfflineAvailable { get; set; } = false;
+        public string OfflineAvailableOn { get; set; } = string.Empty;
         public string SeenOn { get; set; } = null;
         public bool IsDatabaseConfirmed_SeenOn { get; set; } = false;
         public bool IsDatabaseConfirmed_Offline { get; set; } = false;
@@ -57,14 +57,14 @@ namespace Tax_Informer.Core
             SummaryText = bundle.GetString("summaryText");
             Date = bundle.GetString("date");
             LinkOfActualArtical = bundle.GetString("articalLink");
-            IsOfflineAvailable = bundle.GetBoolean("IsOfflineAvailable");
+            OfflineAvailableOn = bundle.GetString(nameof(OfflineAvailableOn));
             SeenOn = bundle.GetString("SeenOn");
             IsDatabaseConfirmed_Offline = bundle.GetBoolean("IsDatabaseConfirmed_Offline");
             IsDatabaseConfirmed_SeenOn = bundle.GetBoolean("IsDatabaseConfirmed_SeenOn");
             //TODO: Read Authors[] and Category[] from bundle
         }
 
-        public Bundle ToBundle()
+        public virtual Bundle ToBundle()
         {
             //TODO: **Complete the full Conversion of ArticalOverview to bundle
             Bundle b = new Bundle();
@@ -72,11 +72,27 @@ namespace Tax_Informer.Core
             b.PutString("summaryText", SummaryText);
             b.PutString("date", Date);
             b.PutString("articalLink", LinkOfActualArtical);
-            b.PutBoolean("IsOfflineAvailable", IsOfflineAvailable);
+            b.PutString(nameof(OfflineAvailableOn), OfflineAvailableOn);
             b.PutBoolean("IsDatabaseConfirmed_Offline", IsDatabaseConfirmed_Offline);
             b.PutBoolean("IsDatabaseConfirmed_SeenOn", IsDatabaseConfirmed_SeenOn);
             b.PutString("SeenOn", SeenOn);
             //TODO: Convert Authors[] and Category[] of ArticalOverview to bundle
+            return b;
+        }
+    }
+
+    internal class ArticalOverviewOffline: ArticalOverview
+    {
+        public string WebsiteKey { get; set; } = null;
+        public ArticalOverviewOffline() : base() { }
+        public ArticalOverviewOffline(Bundle bundle) : base(bundle)
+        {
+            WebsiteKey = bundle.GetString(nameof(WebsiteKey));
+        }
+        public override Bundle ToBundle()
+        {
+            var b = base.ToBundle();
+            b.PutString(nameof(WebsiteKey), WebsiteKey);
             return b;
         }
     }

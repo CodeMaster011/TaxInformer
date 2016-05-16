@@ -2,27 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-//using Android.Database.Sqlite;
 using SQLite;
 using System.Threading;
 using Lib;
 using Android.Util;
-//TODO: Create our own : Android.Database.Sqlite DB system http://www.mysamplecode.com/2011/10/android-sqlite-query-example-selection.html
-//TODO: Watch videos on how to write sqlite query in android
 namespace Tax_Informer.Core
 {
     interface IDatabaseModule
     {
-        void IsSeen(string trasactionId, ArticalOverview articalOverview);
-        void IsSeen(string trasactionId, ArticalOverview[] articalOverview);
-        void UpdateIsSeen(string trasactionId, ArticalOverview articalOverview);
+        void IsSeen(string transactionId, ArticalOverview articalOverview);
+        void IsSeen(string transactionId, ArticalOverview[] articalOverview);
+        void UpdateIsSeen(string transactionId, ArticalOverview articalOverview);
+        void MakeOffline(string transactionId, string websiteKey, Artical artical, ArticalOverview articalOverview);
+        void GetAllOfflineArticalList(string transactionId, IUiOfflineArticalOverviewResponseHandler responseHandler);
+        void GetArtical(string transactionId, ArticalOverview articalOverview, IUiArticalResponseHandler responseHandler);
         void Close();
     }
     internal class DatabaseModule : IDatabaseModule
@@ -35,18 +34,32 @@ namespace Tax_Informer.Core
         private DictionaryStackedQueue<string, InstructionSet> pendingRequest = new DictionaryStackedQueue<string, InstructionSet>();
         private bool isDBclosed = false;
 
-        public void IsSeen(string trasactionId, ArticalOverview articalOverview) => IsSeen(trasactionId, new ArticalOverview[] { articalOverview });
-        public void IsSeen(string trasactionId, ArticalOverview[] articalOverview)
+        public void IsSeen(string transactionId, ArticalOverview articalOverview) => IsSeen(transactionId, new ArticalOverview[] { articalOverview });
+        public void IsSeen(string transactionId, ArticalOverview[] articalOverview)
         {
-            pendingRequest.Push(trasactionId, InstructionSet.IsSeenCheck(articalOverview));
+            pendingRequest.Push(transactionId, InstructionSet.IsSeenCheck(articalOverview));
             handler.Set();
         }
-        public void UpdateIsSeen(string trasactionId, ArticalOverview articalOverview)
+        public void UpdateIsSeen(string transactionId, ArticalOverview articalOverview)
         {
-            pendingRequest.Push(trasactionId, InstructionSet.UpdateIsSeen(articalOverview));
+            pendingRequest.Push(transactionId, InstructionSet.UpdateIsSeen(articalOverview));
             handler.Set();
         }
-
+        public void MakeOffline(string transactionId, string websiteKey, Artical artical, ArticalOverview articalOverview)
+        {
+            pendingRequest.Push(transactionId, InstructionSet.MakeOffline(websiteKey, artical, articalOverview));
+            handler.Set();
+        }
+        public void GetAllOfflineArticalList(string transactionId, IUiOfflineArticalOverviewResponseHandler responseHandler)
+        {
+            pendingRequest.Push(transactionId, InstructionSet.GetAllOfflineArticalList(responseHandler));
+            handler.Set();
+        }
+        public void GetArtical(string transactionId, ArticalOverview articalOverview, IUiArticalResponseHandler responseHandler)
+        {
+            pendingRequest.Push(transactionId, InstructionSet.GetArtical(articalOverview, responseHandler));
+            handler.Set();
+        }
         private void initilizeDB()
         {
             db = new SQLiteConnection(DatabaseFilePath);
@@ -70,7 +83,7 @@ namespace Tax_Informer.Core
                         var request = pendingRequest.Pop(); //get the request for processing
                         lock (request.Value)
                         {
-                            operationSwitcher(request.Value);
+                            operationSwitcher(request.Key, request.Value);
                         }
                     }
                     catch (Exception) { }
@@ -82,7 +95,7 @@ namespace Tax_Informer.Core
             }
         }
 
-        private void operationSwitcher(InstructionSet instrution)
+        private void operationSwitcher(string transactionId, InstructionSet instrution)
         {
             switch (instrution.action)
             {
@@ -94,11 +107,59 @@ namespace Tax_Informer.Core
                 case ActionToPerformInfo.UpdateIsSeen:
                     operationUpdateIsSeen(instrution.articalOverview);
                     break;
-                case ActionToPerformInfo.Update:
+                case ActionToPerformInfo.MakeOffline:
+                    operationMakeOffline(instrution.tags[0] as string, instrution.artical, instrution.articalOverview[0]);
+                    break;
+                case ActionToPerformInfo.GetAllOfflineList:
+                    operationGetAllOfflineList(transactionId, instrution.tags[0] as IUiOfflineArticalOverviewResponseHandler);
+                    break;
+                case ActionToPerformInfo.GetArtical:
+                    operationGetArtical(transactionId, instrution.articalOverview[0], instrution.tags[0] as IUiArticalResponseHandler);
                     break;
                 default:
                     break;
             }            
+        }
+        private void operationGetArtical(string transactionId, ArticalOverview overview, IUiArticalResponseHandler responseHandler)
+        {
+            if (db == null) throw new InvalidOperationException("Database is not created yet.");
+            if (responseHandler == null) return;
+
+            var row = db.Get<OfflineTable>(OfflineTable.GetPrimaryKey(overview));
+            if (row == null) return;
+
+            responseHandler?.ArticalProcessedCallback(transactionId, row.LinkOfActualArtical, row.ToArtical());
+        }
+        private void operationGetAllOfflineList(string transactionId, IUiOfflineArticalOverviewResponseHandler responseHandler)
+        {
+            if (db == null) throw new InvalidOperationException("Database is not created yet.");
+            if (responseHandler == null) return;
+
+            var _list = new TableQuery<OfflineTable>(db).OrderByDescending(e => e.Date).ToList();
+            var result = new List<ArticalOverviewOffline>(_list.Count);
+            foreach (var item in _list)            
+                result.Add(item.ToArticalOverviewOffline());
+            responseHandler?.OfflineArticalOverviewProcessedCallback(transactionId, result.ToArray());
+        }
+        private void operationMakeOffline(string websiteKey, Artical artical, ArticalOverview overview)
+        {
+            if (db == null) throw new InvalidOperationException("Database is not created yet.");
+
+            overview.IsDatabaseConfirmed_Offline = true;
+            overview.OfflineAvailableOn = DateTime.Today.ToString("yyyyMMdd");
+            var obj = OfflineTable.New(websiteKey, artical, overview);
+            try
+            {
+                db.Insert(obj);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    db.Update(obj);
+                }
+                catch (Exception) { }
+            }
         }
 
         private void operationUpdateIsSeen(ArticalOverview[] articalOverviews)
@@ -111,7 +172,7 @@ namespace Tax_Informer.Core
                 {
                     overview.SeenOn = DateTime.Today.ToString("yyyyMMdd");
                     overview.IsDatabaseConfirmed_SeenOn = true;
-                    var obj = BrowserHistoryTable.FromArticalOverview(overview);
+                    var obj = BrowserHistoryTable.New(overview);
                     try
                     {
                         if (db.Insert(obj) != 0)                        
@@ -174,6 +235,7 @@ namespace Tax_Informer.Core
             public ArticalOverview[] articalOverview { get; set; } = null;
             public ActionToPerformInfo action { get; set; } = ActionToPerformInfo.Null;
             public Artical artical { get; set; } = null;
+            public object[] tags { get; set; } = null;
 
             public static InstructionSet IsSeenCheck(ArticalOverview[] overview)
             {
@@ -193,6 +255,33 @@ namespace Tax_Informer.Core
                     artical = null
                 };
             }
+            public static InstructionSet MakeOffline(string wesiteKey, Artical artical, ArticalOverview overview)
+            {
+                return new InstructionSet()
+                {
+                    articalOverview = new ArticalOverview[] { overview },
+                    action = ActionToPerformInfo.MakeOffline,
+                    artical = artical,
+                    tags = new object[] { wesiteKey }
+                };
+            }
+            public static InstructionSet GetAllOfflineArticalList(IUiOfflineArticalOverviewResponseHandler responseHandler)
+            {
+                return new InstructionSet()
+                {
+                    action = ActionToPerformInfo.GetAllOfflineList,
+                    tags = new object[] { responseHandler }
+                };
+            }
+            public static InstructionSet GetArtical(ArticalOverview overview, IUiArticalResponseHandler responseHandler)
+            {
+                return new InstructionSet()
+                {
+                    articalOverview = new ArticalOverview[] { overview },
+                    action = ActionToPerformInfo.GetArtical,
+                    tags = new object[] { responseHandler }
+                };
+            }
         }
 
         private enum ActionToPerformInfo
@@ -200,7 +289,9 @@ namespace Tax_Informer.Core
             Null,
             IsSeenCheck,
             UpdateIsSeen,
-            Update
+            MakeOffline,
+            GetAllOfflineList,
+            GetArtical
         }
 
         [Table("history")]
@@ -211,12 +302,12 @@ namespace Tax_Informer.Core
             public string LastSeenOn { get; set; } = null;
 
             public BrowserHistoryTable() { }
-            public static BrowserHistoryTable FromArticalOverview(ArticalOverview overview)
+            public static BrowserHistoryTable New(ArticalOverview overview)
             {
                 return new BrowserHistoryTable()
                 {
                     URL = overview.LinkOfActualArtical,
-                    LastSeenOn = overview.SeenOn
+                    LastSeenOn = DateTime.Today.ToString("yyyyMMdd")
                 };
             }
             public static string GetPrimaryKey(ArticalOverview overview) => overview.LinkOfActualArtical;
@@ -226,14 +317,57 @@ namespace Tax_Informer.Core
         private class OfflineTable
         {
             [PrimaryKey]
-            public string LinkOfActualArtical { get; set; }
-            public string Title { get; set; }
-            public string SummaryText { get; set; }
-            public string Date { get; set; }
+            public string LinkOfActualArtical { get; set; } = null;
+            public string Title { get; set; } = null;
+            public string SummaryText { get; set; } = null;
+            [Indexed]
+            public string Date { get; set; } = null;
             public string HtmlText { get; set; } = string.Empty;
-            public int IsOfflineAvailable { get; set; } = -1;
+            public string OfflineAvailableOn { get; set; } = string.Empty;
             public string SeenOn { get; set; } = null;
             public string WebsiteKey { get; set; } = null;
+
+            public ArticalOverviewOffline ToArticalOverviewOffline()
+            {
+                return new ArticalOverviewOffline()
+                {
+                    LinkOfActualArtical = LinkOfActualArtical,
+                    Title = Title,
+                    SummaryText = SummaryText,
+                    Date = Date,
+                    IsDatabaseConfirmed_Offline = true,
+                    OfflineAvailableOn = OfflineAvailableOn,
+                    SeenOn = SeenOn,
+                    IsDatabaseConfirmed_SeenOn = true,
+                    WebsiteKey = WebsiteKey
+                };
+            }
+            public Artical ToArtical()
+            {
+                return new Artical()
+                {
+                    MyLink = LinkOfActualArtical,
+                    Title = Title,
+                    HtmlText  =HtmlText,
+                    Date = Date
+                };
+            }
+            public static OfflineTable New(string websiteKey, Artical artical, ArticalOverview overview)
+            {
+                return new OfflineTable()
+                {
+                    LinkOfActualArtical = overview.LinkOfActualArtical,
+                    Title = overview.Title,
+                    SummaryText = overview.SummaryText,
+                    Date =  overview.Date,
+                    SeenOn = overview.SeenOn,
+                    HtmlText = artical.HtmlText,
+                    OfflineAvailableOn = DateTime.Today.ToString("yyyyMMdd"),
+                    WebsiteKey = websiteKey
+                };
+            }
+            public static string GetPrimaryKey(ArticalOverview overview) => overview.LinkOfActualArtical;
+            public static string GetPrimaryKey(Artical artical) => artical.MyLink;
         }
     }
 }

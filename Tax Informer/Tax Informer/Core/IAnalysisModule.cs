@@ -104,22 +104,28 @@ namespace Tax_Informer.Core
         {
             while (IsRunning)
             {
-                if (cancleRequest.Count > 0)
+                try
                 {
-                    offlineModule.CancleRequest(cancleRequest.Dequeue());
-                }
 
-                if (pendingRequest.Count > 0)
-                {
-                    var reqObj = pendingRequest.Dequeue();
-                    offlineModule.RequestData(reqObj, this);
+                    if (cancleRequest.Count > 0)
+                    {
+                        offlineModule.CancleRequest(cancleRequest.Dequeue());
+                    }
+
+                    if (pendingRequest.Count > 0)
+                    {
+                        var reqObj = pendingRequest.Dequeue();
+                        offlineModule.RequestData(reqObj, this);
+                    }
+                    if (pendingResponse.Count > 0)
+                    {
+                        var responsePacket = pendingResponse.Dequeue();
+                        originalResponse(responsePacket);
+                        responsePacket.Dispose();
+                    }
                 }
-                if (pendingResponse.Count > 0)
-                {
-                    var responsePacket = pendingResponse.Dequeue();
-                    originalResponse(responsePacket);
-                    responsePacket.Dispose();
-                }
+                catch (Exception) { }
+
                 Thread.Sleep(1);
             }
         }

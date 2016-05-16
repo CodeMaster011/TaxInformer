@@ -16,21 +16,29 @@ using Java.Lang;
 using Android.Util;
 using Android.Graphics.Drawables;
 using Android.Support.V4.Widget;
+using Android.Support.Design.Widget;
+using other = com.refractored.fab;
+using Android.Support.V7.App;
 
 namespace Tax_Informer.Activities
 {
     [Activity(Label = "ArticalActivity")]
-    internal class ArticalActivity : Activity, IUiArticalResponseHandler
+    internal class ArticalActivity : ActionBarActivity, IUiArticalResponseHandler
     {
         public const string PassArticalOverviewObj = nameof(PassArticalOverviewObj);
         public const string PassWebsiteKey = nameof(PassWebsiteKey);
+        public const string PassIsOffline = nameof(PassIsOffline);
 
+        private ArticalOverview articalOverview = null;
+        private bool isOffline = false;
         private string currentWebsiteKey = null;
         private DrawerLayout navDrawerLayout = null;
         private LinearLayout headerLayout = null;
         private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
         //private WebView webview = null;
         private TextView articalContentTextview = null;
+        private other.ObservableScrollView scrollView = null;
+        private other.FloatingActionButton floatingButton = null;
         private GridView gridview = null;
         private GridviewAdapter adapter = null;
 
@@ -47,25 +55,26 @@ namespace Tax_Informer.Activities
 
         public void ArticalProcessedCallback(string uid, string url, Artical artical)
         {
+            RunOnUiThread(new Action(() =>{ updateArtical(artical); }));
+        }
+        private void updateArtical(Artical artical)
+        {
             currentArtical = artical;//cache the data
 
-            RunOnUiThread(new Action(() =>
-            {
-                //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
-                //webview.Settings.DefaultFontSize = 20;
-                articalContentTextview.Gravity = GravityFlags.Left;
-                articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
-                articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
+            //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
+            //webview.Settings.DefaultFontSize = 20;
+            articalContentTextview.Gravity = GravityFlags.Left;
+            articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
+            articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
-                adapter.NotifyDataSetChanged();
+            adapter.NotifyDataSetChanged();
 
-                //if (artical.RelatedPosts != null)
-                //    gridview.LayoutParameters.Height = artical.RelatedPosts.Length * dpToPx(70);
+            //if (artical.RelatedPosts != null)
+            //    gridview.LayoutParameters.Height = artical.RelatedPosts.Length * dpToPx(70);
 
-                Title = artical.Title;
-                articalDateTextview.Text = GetHumanReadableDate(artical.Date);
-                articalTitleTextview.Text = artical.Title;
-            }));
+            Title = artical.Title;
+            articalDateTextview.Text = GetHumanReadableDate(artical.Date);
+            articalTitleTextview.Text = artical.Title;
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -74,9 +83,9 @@ namespace Tax_Informer.Activities
 
             SetContentView(Resource.Layout.artical);
 
-            ActionBar.Hide();
+            ActionBar?.Hide();
 
-            ArticalOverview articalOverview = null;
+            articalOverview = null;
             Bundle extras = Intent.Extras;
             Website currentWebsite = null;
 
@@ -94,9 +103,18 @@ namespace Tax_Informer.Activities
                 Finish();
                 return;
             }
+            if (extras != null || extras.ContainsKey(PassIsOffline))
+                isOffline = extras.GetBoolean(PassIsOffline);
+            else
+            {
+                Finish();
+                return;
+            }
 
-            analysisModule.ReadArtical(UidGenerator(), currentWebsiteKey, articalOverview, this);  //make the request
-
+            if (!isOffline)
+                analysisModule.ReadArtical(UidGenerator(), currentWebsiteKey, articalOverview, this);  //make the request
+            else
+                database.GetArtical(UidGenerator(), articalOverview, this);
 
             currentWebsite = Config.GetWebsite(currentWebsiteKey);
 
@@ -122,7 +140,11 @@ namespace Tax_Informer.Activities
             articalTitleTextview = FindViewById<TextView>(Resource.Id.articalTitleTextView);
             articalDateTextview = FindViewById<TextView>(Resource.Id.articalDateTextView);
             articalWebsiteComicTextview = FindViewById<TextView>(Resource.Id.articalWebsiteComicTextView);
-            
+            scrollView = FindViewById<other.ObservableScrollView>(Resource.Id.articalScrollView);
+            floatingButton = FindViewById<other.FloatingActionButton>(Resource.Id.articalFab);
+            navDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.articalDrawerLayout);
+
+
             headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
 
             articalTitleTextview.Text = articalOverview.Title;
@@ -131,10 +153,18 @@ namespace Tax_Informer.Activities
             articalContentTextview.Text = "Loading...";
             articalContentTextview.Gravity = GravityFlags.CenterHorizontal;
 
-            navDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.articalDrawerLayout);
+            floatingButton.AttachToScrollView(scrollView);
+            floatingButton.Visibility = !isOffline ? ViewStates.Visible : ViewStates.Gone;
 
             optionOpenInBrowser = FindViewById<TextView>(Resource.Id.articalOptionOpenInBrowserTextView);
             optionOpenInBrowser.Click += OptionOpenInBrowser_Click;
+            floatingButton.Click += FloatingButton_Click;
+        }
+
+        private void FloatingButton_Click(object sender, EventArgs e)
+        {
+            database.MakeOffline(UidGenerator(), currentWebsiteKey, currentArtical, articalOverview);   //request to make data offline
+            Snackbar.Make(sender as View, "Offline is now available", (int)ToastLength.Short).Show();
         }
 
         private void OptionOpenInBrowser_Click(object sender, EventArgs e)
@@ -149,7 +179,8 @@ namespace Tax_Informer.Activities
             navDrawerLayout.CloseDrawer((int)GravityFlags.Right);
 
             Intent intent = new Intent(this, typeof(ArticalActivity));
-            intent.PutExtra(ArticalActivity.PassArticalOverviewObj, currentArtical.RelatedPosts[e.Position].ToBundle());
+            intent.PutExtra(PassArticalOverviewObj, currentArtical.RelatedPosts[e.Position].ToBundle());
+            intent.PutExtra(PassWebsiteKey, currentWebsiteKey);
             StartActivity(intent);
         }
 

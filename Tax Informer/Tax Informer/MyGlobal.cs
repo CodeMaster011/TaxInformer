@@ -52,5 +52,26 @@ namespace Tax_Informer
             else
                 return $"{dd} {Helper.monthArray[mm - 1]} {formatedDate.Substring(0, 4)}";
         }
+
+        public static void StartActivityArtical(Context context, ArticalOverview overview, string websiteKey, bool isOfflineArtical = false)
+        {
+            var b = overview.ToBundle();
+            Intent intent = new Intent(context, typeof(Activities.ArticalActivity));
+            intent.PutExtra(Activities.ArticalActivity.PassArticalOverviewObj, b );
+            intent.PutExtra(Activities.ArticalActivity.PassWebsiteKey, websiteKey);
+            intent.PutExtra(Activities.ArticalActivity.PassIsOffline, isOfflineArtical);
+            context.StartActivity(intent);
+        }
+        public static void StartActivityOffline(Context context)
+        {
+            Intent intent = new Intent(context, typeof(Activities.OfflineActivity));
+            context.StartActivity(intent);
+        }
+        public static void StartActivityOverview(Context context, string websiteKey)
+        {
+            Intent intent = new Intent(context, typeof(Activities.OverviewActivity));
+            intent.PutExtra(Activities.OverviewActivity.PassWebsiteKey, websiteKey);
+            context.StartActivity(intent);
+        }
     }
 }
