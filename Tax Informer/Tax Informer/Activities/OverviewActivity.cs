@@ -14,11 +14,12 @@ using Tax_Informer.Core;
 using static Tax_Informer.MyGlobal;
 using Android.Support.V4.Widget;
 using Android.Graphics.Drawables;
+using Android.Support.V7.App;
 
 namespace Tax_Informer.Activities
 {
     [Activity(Label = "OverviewActivity", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
-    internal class OverviewActivity : Activity, IUiArticalOverviewResponseHandler
+    internal class OverviewActivity : ActionBarActivity, IUiArticalOverviewResponseHandler
     {
         public const string PassWebsiteKey = nameof(PassWebsiteKey);
 
@@ -54,16 +55,21 @@ namespace Tax_Informer.Activities
             browsingContext = OverviewType.IndexPage;
             analysisModule.ReadIndexPage(UidGenerator(), currentWebsiteKey, refreshingLink = currentWebsite.IndexPageLink, this);   //make the request
 
-            ActionBar.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.ParseColor(currentWebsite.Color)));
             Title = currentWebsite.Name;
+            try
+            {
+                ActionBar.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.ParseColor(currentWebsite.Color)));
 
-            Window window = Window;
-            // clear FLAG_TRANSLUCENT_STATUS flag:
-            window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-            window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
-            // finally change the color
-            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+                Window window = Window;
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+                // finally change the color
+                window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+            }
+            catch (System.Exception) { }
+            
 
 
             swipeRefLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swiperefresh);
@@ -132,10 +138,13 @@ namespace Tax_Informer.Activities
         {
             var articalOverview = adapter.data[e.Position];
             database.UpdateIsSeen(UidGenerator(), articalOverview);//add to seen list
-            Intent intent = new Intent(this, typeof(ArticalActivity));
-            intent.PutExtra(ArticalActivity.PassArticalOverviewObj, articalOverview.ToBundle());
-            intent.PutExtra(ArticalActivity.PassWebsiteKey, currentWebsiteKey);
-            StartActivity(intent);
+
+            StartActivityArtical(this, articalOverview, currentWebsiteKey);
+
+            //Intent intent = new Intent(this, typeof(ArticalActivity));
+            //intent.PutExtra(ArticalActivity.PassArticalOverviewObj, articalOverview.ToBundle());
+            //intent.PutExtra(ArticalActivity.PassWebsiteKey, currentWebsiteKey);
+            //StartActivity(intent);
         }
 
         public void ArticalOverviewProcessedCallback(string uid, string url, ArticalOverview[] articalOverviews, OverviewType overviewType, string nextPageUrl)

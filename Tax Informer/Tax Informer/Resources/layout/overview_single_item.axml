@@ -21,7 +21,7 @@
             android:textColor="#ffffff"
             android:visibility="gone" />
         <TextView
-            android:text="Who Are the Real Builders Of A Nation?"
+            android:text=""
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/titleTextView"
@@ -44,7 +44,7 @@
         android:background="#ffffff"
         android:layout_marginBottom="5dp">
         <TextView
-            android:text="No, Not the planners, financiers, engineers, architects, managers. They are one of the inputs in the production process. These groups sit in their posh air-conditioned offices and strain their brain to do their work. Their job involves mental strain"
+            android:text=""
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/summaryTextView"
