@@ -15,6 +15,8 @@ using static Tax_Informer.MyGlobal;
 using Android.Support.V4.Widget;
 using Android.Graphics.Drawables;
 using Android.Support.V7.App;
+using Android.Support.V7.Widget;
+using Android.Support.Design.Widget;
 
 namespace Tax_Informer.Activities
 {
@@ -23,6 +25,8 @@ namespace Tax_Informer.Activities
     {
         public const string PassWebsiteKey = nameof(PassWebsiteKey);
 
+        private AppBarLayout appBarLayout = null;
+        private Android.Support.V7.Widget.Toolbar toolbar = null;
         private Website currentWebsite = null;
         private string currentWebsiteKey = null;
         private DrawerLayout drawerLayout = null;
@@ -34,8 +38,9 @@ namespace Tax_Informer.Activities
         private string refreshingLink = string.Empty;
         public string refreshingRequestUid = string.Empty;
 
-        private ListView listview = null;
-        private ListviewAdpater adapter = null;
+        private RecyclerView recyView = null;
+        private RecyclerViewAdpater adapter = null;
+        private RecyclerView.LayoutManager recyLayoutManager = null;
         private NextPageContext nextPageContext = null;
         private string NextPageRequestUids = string.Empty;
         private OverviewType browsingContext = OverviewType.UNKNOWN;
@@ -55,22 +60,13 @@ namespace Tax_Informer.Activities
             browsingContext = OverviewType.IndexPage;
             analysisModule.ReadIndexPage(UidGenerator(), currentWebsiteKey, refreshingLink = currentWebsite.IndexPageLink, this);   //make the request
 
-            Title = currentWebsite.Name;
-            try
-            {
-                ActionBar.SetBackgroundDrawable(new ColorDrawable(Android.Graphics.Color.ParseColor(currentWebsite.Color)));
+            ChangeStatusBarColor(Window, currentWebsite.Color);
 
-                Window window = Window;
-                // clear FLAG_TRANSLUCENT_STATUS flag:
-                window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-                window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
-                // finally change the color
-                window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
-            }
-            catch (System.Exception) { }
-            
-
+            toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.overviewToolbar);
+            appBarLayout = FindViewById<AppBarLayout>(Resource.Id.overviewAppbar);
+            toolbar.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+            appBarLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+            toolbar.Title = currentWebsite.Name;
 
             swipeRefLayout = FindViewById<SwipeRefreshLayout>(Resource.Id.swiperefresh);
             swipeRefLayout.Refresh += SwipeRefLayout_Refresh;
@@ -86,14 +82,23 @@ namespace Tax_Informer.Activities
             navListview.Adapter = navAdapter;
             navListview.ItemClick += NavListview_ItemClick;
 
-            listview = FindViewById<ListView>(Resource.Id.contentListView);
-            adapter = new ListviewAdpater() { parent = this, currentWebsite = currentWebsite };
-            listview.Adapter = adapter;
-            listview.ItemClick += Listview_ItemClick;
+            recyView = FindViewById<RecyclerView>(Resource.Id.overviewRecyclerView);
+            recyView.SetLayoutManager(recyLayoutManager = new LinearLayoutManager(this, (int)Orientation.Vertical, false));
+            recyView.SetAdapter(adapter = new RecyclerViewAdpater(currentWebsite));
+            adapter.OnItemClick += RecyclerView_OnItemClick;
+            adapter.LoadNextPage += (sender, e) => LoadNextPage();
         }
+
+        private void RecyclerView_OnItemClick(object sender, ArticalOverview articalOverview)
+        {
+            database.UpdateIsSeen(UidGenerator(), articalOverview);//add to seen list
+
+            StartActivityArtical(this, articalOverview, currentWebsiteKey);
+        }
+
         protected override void OnResume()
         {            
-            adapter.NotifyDataSetChanged();
+            adapter?.NotifyDataSetChanged();
 
             base.OnResume();
         }
@@ -134,18 +139,6 @@ namespace Tax_Informer.Activities
             drawerLayout.CloseDrawer((int)GravityFlags.Left);
         }
 
-        private void Listview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
-        {
-            var articalOverview = adapter.data[e.Position];
-            database.UpdateIsSeen(UidGenerator(), articalOverview);//add to seen list
-
-            StartActivityArtical(this, articalOverview, currentWebsiteKey);
-
-            //Intent intent = new Intent(this, typeof(ArticalActivity));
-            //intent.PutExtra(ArticalActivity.PassArticalOverviewObj, articalOverview.ToBundle());
-            //intent.PutExtra(ArticalActivity.PassWebsiteKey, currentWebsiteKey);
-            //StartActivity(intent);
-        }
 
         public void ArticalOverviewProcessedCallback(string uid, string url, ArticalOverview[] articalOverviews, OverviewType overviewType, string nextPageUrl)
         {
@@ -210,13 +203,44 @@ namespace Tax_Informer.Activities
             }
         }
 
-        class ListviewAdpater : BaseAdapter
+        class NextPageContext
         {
-            public ArticalOverview[] data { get; set; } = null;
-            public OverviewActivity parent { get; set; } = null;
-            public Website currentWebsite { get; set; } = null;
+            public OverviewType overviewType { get; set; } = OverviewType.UNKNOWN;
+            public string url { get; set; } = string.Empty;
 
-            public override int Count
+            public object createObj()
+            {
+                switch (overviewType)
+                {
+                    case OverviewType.Null:
+                        break;
+                    case OverviewType.UNKNOWN:
+                        break;
+                    case OverviewType.IndexPage:
+                        break;
+                    case OverviewType.Author:
+                        return new Author() { Link = url };
+                    case OverviewType.Category:
+                        return new Category() { Link = url };
+                    default:
+                        break;
+                }
+                return null;
+            }
+        }
+
+        private class RecyclerViewAdpater : RecyclerView.Adapter
+        {
+            public event EventHandler<ArticalOverview> OnItemClick = null;
+            public event EventHandler LoadNextPage = null;
+            public Website currentWebsite { get; set; } = null;
+            public ArticalOverview[] data { get; set; } = null;
+
+            public RecyclerViewAdpater(Website currentWebsite):base()
+            {
+                this.currentWebsite = currentWebsite;
+            }
+            public override int ItemCount
             {
                 get
                 {
@@ -224,26 +248,10 @@ namespace Tax_Informer.Activities
                 }
             }
 
-            public override Java.Lang.Object GetItem(int position)
+            public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
             {
-                return null;
-            }
-
-            public override long GetItemId(int position)
-            {
-                return position;
-            }
-
-            public override View GetView(int position, View convertView, ViewGroup parent)
-            {
-                if (convertView == null)
-                {
-                    var layoutInflator = (LayoutInflater)this.parent.BaseContext.GetSystemService(Service.LayoutInflaterService);
-                    convertView = layoutInflator.Inflate(Resource.Layout.overview_single_item, parent, false);
-                    convertView.Tag = new ViewHolder(convertView);  //TODO: Add the onClick listeners tags and author
-                }
-                var vHolder = convertView.Tag as ViewHolder;
                 var item = data[position];
+                var vHolder = holder as ViewHolder;
 
                 vHolder.websiteComicTextView.Text = currentWebsite.ComicText;
                 vHolder.websiteComicTextView.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
@@ -261,7 +269,7 @@ namespace Tax_Informer.Activities
                 }
                 else vHolder.authorTextView.Visibility = ViewStates.Gone;
 
-                if(item.IsDatabaseConfirmed_SeenOn && !string.IsNullOrEmpty(item.SeenOn))
+                if (item.IsDatabaseConfirmed_SeenOn && !string.IsNullOrEmpty(item.SeenOn))
                     vHolder.titleTextView.Alpha = 0.2f;
                 else
                     vHolder.titleTextView.Alpha = 1f;
@@ -286,17 +294,23 @@ namespace Tax_Informer.Activities
                 //}
 
 
-                if (data.Length - position <= NextPageContentNumber) this.parent.LoadNextPage();    //sent a request to load next page
+                if (data.Length - position <= NextPageContentNumber) LoadNextPage?.Invoke(this, null); //this.parent.LoadNextPage();    //sent a request to load next page
 
-                return convertView;
             }
 
-            class ViewHolder: Java.Lang.Object
+            public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+            {
+                var layoutInflator = (LayoutInflater)parent.Context.GetSystemService(Service.LayoutInflaterService);
+                var view = layoutInflator.Inflate(Resource.Layout.overview_single_item, parent, false);
+                return new ViewHolder(view, onItemClick);
+            }
+            private void onItemClick(int position) => OnItemClick?.Invoke(this, data[position]);
+            class ViewHolder : RecyclerView.ViewHolder
             {
                 public TextView websiteComicTextView, titleTextView, summaryTextView, authorTextView, dateTextView;
                 public TextView[] tag = null;
 
-                public ViewHolder(View v)
+                public ViewHolder(View v, Action<int> onClick):base(v)
                 {
                     websiteComicTextView = v.FindViewById<TextView>(Resource.Id.websiteComicTextView);
                     titleTextView = v.FindViewById<TextView>(Resource.Id.titleTextView);
@@ -308,35 +322,10 @@ namespace Tax_Informer.Activities
                     tag[0] = v.FindViewById<TextView>(Resource.Id.tagTextView1);
                     tag[1] = v.FindViewById<TextView>(Resource.Id.tagTextView2);
                     tag[2] = v.FindViewById<TextView>(Resource.Id.tagTextView3);
-
                     //TODO: Pass the onClick listeners on tags and author
-                }
-            }
-        }
 
-        class NextPageContext
-        {
-            public OverviewType overviewType { get; set; } = OverviewType.UNKNOWN;
-            public string url { get; set; } = string.Empty;
-
-            public object createObj()
-            {
-                switch (overviewType)
-                {
-                    case OverviewType.Null:
-                        break;
-                    case OverviewType.UNKNOWN:
-                        break;
-                    case OverviewType.IndexPage:
-                        break;
-                    case OverviewType.Author:
-                        return new Author() { Link = url };
-                    case OverviewType.Category:
-                        return new Category() { Link = url };
-                    default:
-                        break;
+                    v.Click += (sender, e) => onClick(AdapterPosition);
                 }
-                return null;
             }
         }
     }

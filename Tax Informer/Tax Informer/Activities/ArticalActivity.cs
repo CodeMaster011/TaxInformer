@@ -122,13 +122,7 @@ namespace Tax_Informer.Activities
             //webview.Settings.DefaultFontSize = 20;
             //webview.Settings.BuiltInZoomControls = true;
 
-            Window window = Window;
-            // clear FLAG_TRANSLUCENT_STATUS flag:
-            window.ClearFlags(WindowManagerFlags.TranslucentStatus);
-            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-            window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
-            // finally change the color
-            window.SetStatusBarColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
+            ChangeStatusBarColor(Window, currentWebsite.Color);
 
             gridview = FindViewById<GridView>(Resource.Id.relatedPostGridView);
             adapter = new GridviewAdapter() { parent = this };

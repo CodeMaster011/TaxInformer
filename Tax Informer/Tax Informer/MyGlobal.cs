@@ -15,7 +15,6 @@ namespace Tax_Informer
 {
     internal static class MyGlobal
     {
-        public static int currentDate = int.Parse(DateTime.Now.ToString("yyyyMMdd"));  //YYYYMMDD
         public static bool IsRunning = true;
         public static int NextPageContentNumber = 5;
         public static IAnalysisModule analysisModule = new AnalysisModule();
@@ -29,6 +28,8 @@ namespace Tax_Informer
         public static string GetHumanReadableDate(string formatedDate)
         {
             if (formatedDate == null || formatedDate == string.Empty) return null;
+
+            int currentDate = int.Parse(DateTime.Now.ToString("yyyyMMdd"));
 
             var req = int.Parse(formatedDate);
             var diff = currentDate - req;
@@ -51,6 +52,20 @@ namespace Tax_Informer
                 return Helper.monthArray[mm - 1] + " " + dd.ToString();
             else
                 return $"{dd} {Helper.monthArray[mm - 1]} {formatedDate.Substring(0, 4)}";
+        }
+
+        public static void ChangeStatusBarColor(Window window, string color)
+        {
+            try
+            {
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+                // finally change the color
+                window.SetStatusBarColor(Android.Graphics.Color.ParseColor(color));
+            }
+            catch (Exception) { }
         }
 
         public static void StartActivityArtical(Context context, ArticalOverview overview, string websiteKey, bool isOfflineArtical = false)

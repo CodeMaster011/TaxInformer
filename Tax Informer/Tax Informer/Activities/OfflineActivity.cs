@@ -40,6 +40,7 @@ namespace Tax_Informer.Activities
             toolbar.Title = "Offline";
             toolbar.SetBackgroundColor(Android.Graphics.Color.ParseColor("#4CAF50"));
             toolbar.SetTitleTextColor(Android.Graphics.Color.ParseColor("#ffffff"));
+            MyGlobal.ChangeStatusBarColor(Window, "#4CAF50");
 
             MyGlobal.database.GetAllOfflineArticalList(MyGlobal.UidGenerator(), this);
         }

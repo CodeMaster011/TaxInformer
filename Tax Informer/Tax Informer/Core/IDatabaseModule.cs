@@ -320,9 +320,9 @@ namespace Tax_Informer.Core
             public string LinkOfActualArtical { get; set; } = null;
             public string Title { get; set; } = null;
             public string SummaryText { get; set; } = null;
-            [Indexed]
             public string Date { get; set; } = null;
             public string HtmlText { get; set; } = string.Empty;
+            [Indexed]
             public string OfflineAvailableOn { get; set; } = string.Empty;
             public string SeenOn { get; set; } = null;
             public string WebsiteKey { get; set; } = null;
