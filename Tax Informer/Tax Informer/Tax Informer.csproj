@@ -105,6 +105,8 @@
     <Compile Include="Core\IResponseHandler.cs" />
     <Compile Include="Core\IUiResponseHandler.cs" />
     <Compile Include="Core\NextPageInfo.cs" />
+    <Compile Include="Fragments\MainFragment.cs" />
+    <Compile Include="Fragments\OfflineFragment.cs" />
     <Compile Include="lib.cs" />
     <Compile Include="MyGlobal.cs" />
     <Compile Include="Core\Website.cs" />
@@ -140,6 +142,9 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\main_website_list.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\main_offline_list.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>

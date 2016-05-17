@@ -23,7 +23,7 @@ using Android.Support.V7.App;
 namespace Tax_Informer.Activities
 {
     [Activity(Label = "ArticalActivity")]
-    internal class ArticalActivity : ActionBarActivity, IUiArticalResponseHandler
+    internal class ArticalActivity : AppCompatActivity, IUiArticalResponseHandler
     {
         public const string PassArticalOverviewObj = nameof(PassArticalOverviewObj);
         public const string PassWebsiteKey = nameof(PassWebsiteKey);
@@ -141,9 +141,9 @@ namespace Tax_Informer.Activities
 
             headerLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(currentWebsite.Color));
 
-            articalTitleTextview.Text = articalOverview.Title;
-            articalDateTextview.Text = GetHumanReadableDate(articalOverview.Date);
-            articalWebsiteComicTextview.Text = currentWebsite.ComicText;
+            articalTitleTextview.Text = articalOverview.Title ?? "";
+            articalDateTextview.Text = GetHumanReadableDate(articalOverview.Date) ?? "";
+            articalWebsiteComicTextview.Text = currentWebsite.ComicText ?? "";
             articalContentTextview.Text = "Loading...";
             articalContentTextview.Gravity = GravityFlags.CenterHorizontal;
 
@@ -170,12 +170,8 @@ namespace Tax_Informer.Activities
 
         private void Gridview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            navDrawerLayout.CloseDrawer((int)GravityFlags.Right);
-
-            Intent intent = new Intent(this, typeof(ArticalActivity));
-            intent.PutExtra(PassArticalOverviewObj, currentArtical.RelatedPosts[e.Position].ToBundle());
-            intent.PutExtra(PassWebsiteKey, currentWebsiteKey);
-            StartActivity(intent);
+            navDrawerLayout.CloseDrawer((int)GravityFlags.Right);            
+            StartActivityArtical(this, currentArtical.RelatedPosts[e.Position], currentWebsiteKey);            
         }
 
         class GridviewAdapter : BaseAdapter

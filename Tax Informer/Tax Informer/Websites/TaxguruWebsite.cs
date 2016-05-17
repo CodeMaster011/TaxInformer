@@ -22,7 +22,7 @@ namespace Tax_Informer.Websites
 
         public override string Name { get; } = "Taxguru";
 
-        public override string Color { get; } = "#E91E63";  //500
+        public override string Color { get; } = "#EC407A";  //400
 
         public override Category[] Categories
         {

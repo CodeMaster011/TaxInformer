@@ -9,18 +9,25 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Tax_Informer.Core;
 using Android.Util;
+using SupportToolBar = Android.Support.V7.Widget.Toolbar;
+using SupportFragment = Android.Support.V4.App.Fragment;
+using SupportFragmentManager = Android.Support.V4.App.FragmentManager;
+using SupportActionBar = Android.Support.V7.App.ActionBar;
+using Android.Support.Design.Widget;
+using Android.Support.V4.View;
+using Android.Support.V4.App;
+using Java.Lang;
+using System.Collections.Generic;
 
 [assembly: Application(Theme = "@style/MyTheme")]//"@android:style/Theme.Material.Light"
 namespace Tax_Informer
 {
 
     [Activity(Label = "Tax Informer", MainLauncher = true, Icon = "@drawable/icon")]
-    public class MainActivity : ActionBarActivity
+    public class MainActivity : AppCompatActivity
     {
-        private RecyAdapter adapter = null;
-        private RecyclerView recyclerView = null;
-        private RecyclerView.LayoutManager recyLayoutManager = null;
-        private Android.Support.V7.Widget.Toolbar toolbar = null;
+        private TabAdapter adapter = null;
+        private SupportToolBar toolBar = null;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -29,23 +36,43 @@ namespace Tax_Informer
             SetContentView(Resource.Layout.Main);
 
             MyGlobal.ChangeStatusBarColor(Window, "#673AB7");
+            toolBar = FindViewById<SupportToolBar>(Resource.Id.mainToolbar);
+            toolBar.Title = "Tax Informer";
+            //toolBar.Title = "Tax Informer";
 
-            toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.mainToolbar);
-            toolbar.Title = "Tax Informer";
+            //SetSupportActionBar(toolBar);
 
-            recyclerView = FindViewById<RecyclerView>(Resource.Id.mainRecyclerView);
-            recyclerView.SetLayoutManager(recyLayoutManager = new GridLayoutManager(this, 2, (int)Orientation.Vertical, false));
-            recyclerView.SetAdapter(adapter = new RecyAdapter());
-            adapter.OnItemClick += Adapter_OnItemClick;
+            //SupportActionBar ab = SupportActionBar;
+            //ab.SetHomeAsUpIndicator(Resource.Drawable.ic_menu);
+            //ab.SetDisplayHomeAsUpEnabled(true);
 
-            var data = new string[Config.websites.Keys.Count];
-            Config.websites.Keys.CopyTo(data, 0);
-            adapter.data = data;
+            //mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
+
+            //NavigationView navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
+            //if (navigationView != null)
+            //{
+            //    SetUpDrawerContent(navigationView);
+            //}
+
+            TabLayout tabs = FindViewById<TabLayout>(Resource.Id.mainTabs);
+
+            ViewPager viewPager = FindViewById<ViewPager>(Resource.Id.mainViewpager);
+
+            SetUpViewPager(viewPager);
+
+            tabs.SetupWithViewPager(viewPager);
+
+
         }
+        
 
-        private void Adapter_OnItemClick(object sender, string websiteKey)
+        private void SetUpViewPager(ViewPager viewPager)
         {
-            MyGlobal.StartActivityOverview(this, websiteKey);
+            adapter = new TabAdapter(SupportFragmentManager);
+            adapter.AddFragment(new Fragments.MainFragment(), "Online");
+            adapter.AddFragment(new Fragments.OfflineFragment(), "Offline");
+
+            viewPager.Adapter = adapter;
         }
 
         public override void OnBackPressed()
@@ -53,62 +80,44 @@ namespace Tax_Informer
             MyGlobal.database.Close();
             base.OnBackPressed();
         }
-        private class RecyAdapter : RecyclerView.Adapter
+
+        public class TabAdapter : FragmentPagerAdapter
         {
-            public string[] data { get; set; } = null;
+            public List<SupportFragment> Fragments { get; set; }
+            public List<string> FragmentNames { get; set; }
 
-            public event EventHandler<string> OnItemClick = null;
+            public TabAdapter(SupportFragmentManager sfm) : base(sfm)
+            {
+                Fragments = new List<SupportFragment>();
+                FragmentNames = new List<string>();
+            }
 
-            public override int ItemCount
+            public void AddFragment(SupportFragment fragment, string name)
+            {
+                Fragments.Add(fragment);
+                FragmentNames.Add(name);
+            }
+
+            public override int Count
             {
                 get
                 {
-                    return data == null ? 0 : data.Length;
+                    return Fragments.Count;
                 }
             }
-            public override void OnBindViewHolder(RecyclerView.ViewHolder _holder, int position)
+
+            public override SupportFragment GetItem(int position)
             {
-                try
-                {
-
-                    var holder = _holder as ViewHolder;
-                    var data = this.data[position];
-                    var website = Config.GetWebsite(data);
-
-                    holder.websiteComicTextView.Text = website.ComicText;
-                    holder.linearLayout.SetBackgroundColor(Android.Graphics.Color.ParseColor(website.Color));
-
-                    holder.websiteNameTextView.Text = website.Name;
-                }
-                catch (Exception) { }
+                return Fragments[position];
             }
 
-            public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+            public override ICharSequence GetPageTitleFormatted(int position)
             {
-                var layoutInflator = (LayoutInflater)parent.Context.GetSystemService(Service.LayoutInflaterService);
-                var view = layoutInflator.Inflate(Resource.Layout.main_single_item, parent, false);
-                return new ViewHolder(view, onItemClickCallback);
-            }
-
-            private void onItemClickCallback(object o, int position) => OnItemClick?.Invoke(o, data[position]);
-
-            private class ViewHolder : RecyclerView.ViewHolder
-            {
-                public TextView websiteComicTextView, websiteNameTextView;
-                public LinearLayout linearLayout;
-
-                public ViewHolder(View v, Action<object, int> onClickCallback) : base(v)
-                {
-                    websiteComicTextView = v.FindViewById<TextView>(Resource.Id.main_single_item_websiteComicText);
-                    websiteNameTextView = v.FindViewById<TextView>(Resource.Id.main_single_item_websiteName);
-                    linearLayout = v.FindViewById<LinearLayout>(Resource.Id.main_single_item_LinearLayout);
-
-                    v.Click += (sender, e) => onClickCallback(v, base.AdapterPosition);
-                }
+                return new Java.Lang.String(FragmentNames[position]);
             }
         }
-                
     }
+
     public class AutofitRecyclerView : RecyclerView
     {
         private GridLayoutManager manager;
@@ -145,7 +154,7 @@ namespace Tax_Informer
             base.OnMeasure(widthSpec, heightSpec);
             if (columnWidth > 0)
             {
-                int spanCount = Math.Max(1, MeasuredWidth / columnWidth);
+                int spanCount = System.Math.Max(1, MeasuredWidth / columnWidth);
                 manager.SpanCount = spanCount;
             }
 

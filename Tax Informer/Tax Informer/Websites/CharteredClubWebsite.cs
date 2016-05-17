@@ -16,7 +16,7 @@ namespace Tax_Informer.Websites
 {
     internal class CharteredClubWebsite : Website
     {
-        public override string Color { get; } = "#9C27B0";
+        public override string Color { get; } = "#AB47BC";//400
 
         public override string ComicText { get; } = "CC";
 
