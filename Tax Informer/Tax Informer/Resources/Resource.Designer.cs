@@ -1944,7 +1944,10 @@ namespace Tax_Informer
 			public const int Icon = 2130837584;
 			
 			// aapt resource value: 0x7f020051
-			public const int notification_template_icon_bg = 2130837585;
+			public const int money = 2130837585;
+			
+			// aapt resource value: 0x7f020052
+			public const int notification_template_icon_bg = 2130837586;
 			
 			static Drawable()
 			{

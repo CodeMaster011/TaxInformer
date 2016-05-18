@@ -23,7 +23,7 @@ using System.Collections.Generic;
 namespace Tax_Informer
 {
 
-    [Activity(Label = "Tax Informer", MainLauncher = true, Icon = "@drawable/icon")]
+    [Activity(Label = "Tax Informer", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
         private TabAdapter adapter = null;
