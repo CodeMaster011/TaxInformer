@@ -135,7 +135,7 @@ namespace Tax_Informer.Core
             if (db == null) throw new InvalidOperationException("Database is not created yet.");
             if (responseHandler == null) return;
 
-            var _list = new TableQuery<OfflineTable>(db).OrderByDescending(e => e.Date).ToList();
+            var _list = new TableQuery<OfflineTable>(db).OrderByDescending(e => e.OfflineAvailableOn).ToList();
             var result = new List<ArticalOverviewOffline>(_list.Count);
             foreach (var item in _list)            
                 result.Add(item.ToArticalOverviewOffline());

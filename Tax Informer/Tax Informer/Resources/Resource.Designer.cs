@@ -2055,8 +2055,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06006d
 			public const int articalWebsiteComicTextView = 2131099757;
 			
-			// aapt resource value: 0x7f0600a9
-			public const int authorTextView = 2131099817;
+			// aapt resource value: 0x7f0600ab
+			public const int authorTextView = 2131099819;
 			
 			// aapt resource value: 0x7f06001b
 			public const int beginning = 2131099675;
@@ -2103,8 +2103,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06004f
 			public const int customPanel = 2131099727;
 			
-			// aapt resource value: 0x7f0600a8
-			public const int dateTextView = 2131099816;
+			// aapt resource value: 0x7f0600aa
+			public const int dateTextView = 2131099818;
 			
 			// aapt resource value: 0x7f060058
 			public const int decor_content_parent = 2131099736;
@@ -2196,20 +2196,20 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f060096
 			public const int line3 = 2131099798;
 			
-			// aapt resource value: 0x7f0600a2
-			public const int linearLayout1 = 2131099810;
+			// aapt resource value: 0x7f0600a4
+			public const int linearLayout1 = 2131099812;
 			
 			// aapt resource value: 0x7f06006f
 			public const int linearLayout10 = 2131099759;
 			
+			// aapt resource value: 0x7f0600a9
+			public const int linearLayout2 = 2131099817;
+			
 			// aapt resource value: 0x7f0600a7
-			public const int linearLayout2 = 2131099815;
+			public const int linearLayout3 = 2131099815;
 			
-			// aapt resource value: 0x7f0600a5
-			public const int linearLayout3 = 2131099813;
-			
-			// aapt resource value: 0x7f0600aa
-			public const int linearLayout4 = 2131099818;
+			// aapt resource value: 0x7f0600ac
+			public const int linearLayout4 = 2131099820;
 			
 			// aapt resource value: 0x7f06006b
 			public const int linearLayout8 = 2131099755;
@@ -2286,6 +2286,9 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06009d
 			public const int overviewAppbar = 2131099805;
 			
+			// aapt resource value: 0x7f0600a3
+			public const int overviewCatNameTextView = 2131099811;
+			
 			// aapt resource value: 0x7f06009c
 			public const int overviewDrawerLayout = 2131099804;
 			
@@ -2294,6 +2297,12 @@ namespace Tax_Informer
 			
 			// aapt resource value: 0x7f06009e
 			public const int overviewToolbar = 2131099806;
+			
+			// aapt resource value: 0x7f0600a2
+			public const int overview_cat_cardView = 2131099810;
+			
+			// aapt resource value: 0x7f0600b0
+			public const int overview_cat_horizontalScrollView = 2131099824;
 			
 			// aapt resource value: 0x7f060028
 			public const int parallax = 2131099688;
@@ -2418,8 +2427,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f060065
 			public const int submit_area = 2131099749;
 			
-			// aapt resource value: 0x7f0600a6
-			public const int summaryTextView = 2131099814;
+			// aapt resource value: 0x7f0600a8
+			public const int summaryTextView = 2131099816;
 			
 			// aapt resource value: 0x7f06009f
 			public const int swiperefresh = 2131099807;
@@ -2427,14 +2436,14 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06000d
 			public const int tabMode = 2131099661;
 			
-			// aapt resource value: 0x7f0600ab
-			public const int tagTextView1 = 2131099819;
-			
-			// aapt resource value: 0x7f0600ac
-			public const int tagTextView2 = 2131099820;
-			
 			// aapt resource value: 0x7f0600ad
-			public const int tagTextView3 = 2131099821;
+			public const int tagTextView1 = 2131099821;
+			
+			// aapt resource value: 0x7f0600ae
+			public const int tagTextView2 = 2131099822;
+			
+			// aapt resource value: 0x7f0600af
+			public const int tagTextView3 = 2131099823;
 			
 			// aapt resource value: 0x7f060097
 			public const int text = 2131099799;
@@ -2451,8 +2460,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f060043
 			public const int title = 2131099715;
 			
-			// aapt resource value: 0x7f0600a4
-			public const int titleTextView = 2131099812;
+			// aapt resource value: 0x7f0600a6
+			public const int titleTextView = 2131099814;
 			
 			// aapt resource value: 0x7f060048
 			public const int title_template = 2131099720;
@@ -2475,8 +2484,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06000a
 			public const int view_offset_helper = 2131099658;
 			
-			// aapt resource value: 0x7f0600a3
-			public const int websiteComicTextView = 2131099811;
+			// aapt resource value: 0x7f0600a5
+			public const int websiteComicTextView = 2131099813;
 			
 			// aapt resource value: 0x7f060022
 			public const int withText = 2131099682;
@@ -2691,19 +2700,25 @@ namespace Tax_Informer
 			public const int overview = 2130903092;
 			
 			// aapt resource value: 0x7f030035
-			public const int overview_single_item = 2130903093;
+			public const int overview_cat_single_item = 2130903093;
 			
 			// aapt resource value: 0x7f030036
-			public const int select_dialog_item_material = 2130903094;
+			public const int overview_single_item = 2130903094;
 			
 			// aapt resource value: 0x7f030037
-			public const int select_dialog_multichoice_material = 2130903095;
+			public const int overview_single_item_category = 2130903095;
 			
 			// aapt resource value: 0x7f030038
-			public const int select_dialog_singlechoice_material = 2130903096;
+			public const int select_dialog_item_material = 2130903096;
 			
 			// aapt resource value: 0x7f030039
-			public const int support_simple_spinner_dropdown_item = 2130903097;
+			public const int select_dialog_multichoice_material = 2130903097;
+			
+			// aapt resource value: 0x7f03003a
+			public const int select_dialog_singlechoice_material = 2130903098;
+			
+			// aapt resource value: 0x7f03003b
+			public const int support_simple_spinner_dropdown_item = 2130903099;
 			
 			static Layout()
 			{

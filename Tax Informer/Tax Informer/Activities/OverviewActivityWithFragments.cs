@@ -1,14 +1,16 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 using Android.App;
 using Android.Content;
+using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Android.OS;
 using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Tax_Informer.Core;
-using Android.Util;
 using SupportToolBar = Android.Support.V7.Widget.Toolbar;
 using SupportFragment = Android.Support.V4.App.Fragment;
 using SupportFragmentManager = Android.Support.V4.App.FragmentManager;
@@ -17,28 +19,37 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.App;
 using Java.Lang;
-using System.Collections.Generic;
 
-[assembly: Application(Theme = "@style/MyTheme")]//"@android:style/Theme.Material.Light"
-namespace Tax_Informer
+namespace Tax_Informer.Activities
 {
-
-    [Activity(Label = "Tax Informer", MainLauncher = true)]
-    public class MainActivity : AppCompatActivity
+    [Activity(Label = "Overview")]
+    public class OverviewActivityWithFragments : AppCompatActivity
     {
+        public const string PassWebsiteKey = nameof(PassWebsiteKey);
+
+        private string currentWebsiteKey = null;
         private TabAdapter adapter = null;
         private SupportToolBar toolBar = null;
-        protected override void OnCreate(Bundle bundle)
+        private TabLayout tabs = null;
+        protected override void OnCreate(Bundle savedInstanceState)
         {
-            base.OnCreate(bundle);
+            base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.Main);
 
-            MyGlobal.ChangeStatusBarColor(Window, "#673AB7");
-            toolBar = FindViewById<SupportToolBar>(Resource.Id.mainToolbar);
-            toolBar.Title = "Tax Informer";
+            if (Intent.Extras != null && Intent.Extras.ContainsKey(PassWebsiteKey))
+                currentWebsiteKey = Intent.Extras.GetString(PassWebsiteKey);
+            else { Finish(); return; }
 
-            TabLayout tabs = FindViewById<TabLayout>(Resource.Id.mainTabs);
+            var website = Config.GetWebsite(currentWebsiteKey);
+
+            MyGlobal.ChangeStatusBarColor(Window, website.Color);
+            toolBar = FindViewById<SupportToolBar>(Resource.Id.mainToolbar);
+            toolBar.Title = website.Name;
+            toolBar.SetBackgroundColor(Android.Graphics.Color.ParseColor(website.Color));
+
+            tabs = FindViewById<TabLayout>(Resource.Id.mainTabs);
+            tabs.SetBackgroundColor(Android.Graphics.Color.ParseColor(website.Color));
 
             ViewPager viewPager = FindViewById<ViewPager>(Resource.Id.mainViewpager);
 
@@ -46,21 +57,23 @@ namespace Tax_Informer
 
             tabs.SetupWithViewPager(viewPager);
         }
-        
 
         private void SetUpViewPager(ViewPager viewPager)
         {
             adapter = new TabAdapter(SupportFragmentManager);
-            adapter.AddFragment(new Fragments.MainFragment(), "Online");
-            adapter.AddFragment(new Fragments.OfflineFragment(), "Offline");
+            try
+            {
+                var websiteGroup = Config.GetWebsite(currentWebsiteKey) as WebsiteGroup;
+                foreach (var child in websiteGroup.ChildWebsites)                
+                    adapter.AddFragment(new Fragments.OverviewFragment(child.HiddenKey), child.ChildName);                
+            }
+            catch (System.Exception)
+            {
+                adapter.AddFragment(new Fragments.OverviewFragment(currentWebsiteKey), Config.GetWebsite(currentWebsiteKey).Name);
+                tabs.Visibility = ViewStates.Gone;
+            }            
 
             viewPager.Adapter = adapter;
-        }
-
-        public override void OnBackPressed()
-        {
-            MyGlobal.database.Close();
-            base.OnBackPressed();
         }
 
         public class TabAdapter : FragmentPagerAdapter
@@ -99,48 +112,4 @@ namespace Tax_Informer
             }
         }
     }
-
-    public class AutofitRecyclerView : RecyclerView
-    {
-        private GridLayoutManager manager;
-        private int columnWidth = -1;
-
-        public AutofitRecyclerView(Context context) : base(context)
-        {
-
-            init(context, null);
-        }
-
-        public AutofitRecyclerView(Context context, IAttributeSet attrs) : base(context, attrs)
-        {
-
-            init(context, attrs);
-        }
-
-        public AutofitRecyclerView(Context context, IAttributeSet attrs, int defStyle) : base(context, attrs, defStyle)
-        {
-
-            init(context, attrs);
-        }
-
-        private void init(Context context, IAttributeSet attrs)
-        {
-
-            manager = new GridLayoutManager(Context, 1);
-            SetLayoutManager(manager);
-        }
-
-
-        protected void onMeasure(int widthSpec, int heightSpec)
-        {
-            base.OnMeasure(widthSpec, heightSpec);
-            if (columnWidth > 0)
-            {
-                int spanCount = System.Math.Max(1, MeasuredWidth / columnWidth);
-                manager.SpanCount = spanCount;
-            }
-
-        }
-    }
 }
-
