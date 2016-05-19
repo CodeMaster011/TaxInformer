@@ -427,6 +427,13 @@ namespace Tax_Informer
             }
             return 0;
         }
+
+        public static string CombindUrl(string baseUrl, string other)
+        {
+            if (other.StartsWith("http://") || other.StartsWith("https://")) return other;
+            if (baseUrl != null && !baseUrl.EndsWith("/")) baseUrl += "/";
+            return $"{baseUrl ?? ""}{other ?? ""}";
+        }
     }
     public class SearchCritriaBuilder
     {

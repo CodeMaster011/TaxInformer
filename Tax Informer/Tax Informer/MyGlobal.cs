@@ -84,8 +84,8 @@ namespace Tax_Informer
         }
         public static void StartActivityOverview(Context context, string websiteKey)
         {
-            Intent intent = new Intent(context, typeof(Activities.OverviewActivity));
-            intent.PutExtra(Activities.OverviewActivity.PassWebsiteKey, websiteKey);
+            Intent intent = new Intent(context, typeof(Activities.OverviewActivityWithFragments));
+            intent.PutExtra(Activities.OverviewActivityWithFragments.PassWebsiteKey, websiteKey);
             context.StartActivity(intent);
         }
     }

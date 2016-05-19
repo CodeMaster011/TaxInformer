@@ -21,7 +21,7 @@ using Android.Support.Design.Widget;
 namespace Tax_Informer.Activities
 {
     [Activity(Label = "OverviewActivity", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
-    internal class OverviewActivity : ActionBarActivity, IUiArticalOverviewResponseHandler
+    internal class OverviewActivity : AppCompatActivity, IUiArticalOverviewResponseHandler
     {
         public const string PassWebsiteKey = nameof(PassWebsiteKey);
 

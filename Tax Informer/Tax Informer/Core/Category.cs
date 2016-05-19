@@ -12,7 +12,7 @@ using Android.Widget;
 
 namespace Tax_Informer.Core
 {
-    internal sealed class Category
+    internal sealed class Category: Java.Lang.Object
     {
         public string Name { get; set; } = string.Empty;
         public string Link { get; set; } = string.Empty;
