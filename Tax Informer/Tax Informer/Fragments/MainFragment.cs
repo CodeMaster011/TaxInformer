@@ -27,10 +27,14 @@ namespace Tax_Informer.Fragments
             base.OnCreate(savedInstanceState);
 
             // Create your fragment here
+
+            MyLog.Log(this, "Fragments creating...");
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            MyLog.Log(this, "Fragments view creating...");
+
             recyclerView = inflater.Inflate(Resource.Layout.main_website_list, container, false) as RecyclerView;
             recyclerView.SetLayoutManager(recyLayoutManager = new GridLayoutManager(container.Context, 2, (int)Orientation.Vertical, false));
             recyclerView.AddItemDecoration(new VerticalSpaceItemDecoration(10, 10));
@@ -38,14 +42,21 @@ namespace Tax_Informer.Fragments
             adapter.OnItemClick += Adapter_OnItemClick;
 
             var data = new string[Config.websites.Keys.Count];
+
+            MyLog.Log(this, "Updating adapter data...");
             Config.websites.Keys.CopyTo(data, 0);
             adapter.data = data;
+            MyLog.Log(this, $"Updating adapter data...Done(Length:{adapter.data?.Length})");
 
+            MyLog.Log(this, "Fragments view creating...Done");
             return recyclerView;
         }
         private void Adapter_OnItemClick(object sender, string websiteKey)
         {
+            MyLog.Log(this, "Adapter OnItemClick - websiteKey : " + websiteKey);
+            MyLog.Log(this, $"starting overview activity - websiteKey :  {websiteKey}...");
             MyGlobal.StartActivityOverview(this.Activity, websiteKey);
+            MyLog.Log(this, $"starting overview activity - websiteKey :  {websiteKey}...Done");
         }
 
 

@@ -31,6 +31,7 @@ namespace Tax_Informer
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+            MyLog.Log(this, $"OnCreate...");
 
             MyGlobal.applicationContext = this;
 
@@ -45,9 +46,12 @@ namespace Tax_Informer
 
             ViewPager viewPager = FindViewById<ViewPager>(Resource.Id.mainViewpager);
 
+            MyLog.Log(this, "Implementing Fragments...");
             SetUpViewPager(viewPager);
-
+            MyLog.Log(this, "Implementing Fragments...Done");
             tabs.SetupWithViewPager(viewPager);
+
+            MyLog.Log(this, $"OnCreate...Done");
         }
         
 
