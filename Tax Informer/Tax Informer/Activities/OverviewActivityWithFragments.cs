@@ -35,6 +35,8 @@ namespace Tax_Informer.Activities
         {
             base.OnCreate(savedInstanceState);
 
+            MyLog.Log(this, $"OnCreate...");
+
             SetContentView(Resource.Layout.Main);
             
             if (Intent.Extras != null && Intent.Extras.ContainsKey(PassWebsiteKey))
@@ -56,6 +58,8 @@ namespace Tax_Informer.Activities
             SetUpViewPager(viewPager);
 
             tabs.SetupWithViewPager(viewPager);
+
+            MyLog.Log(this, $"OnCreate...Done");
         }
 
         private void SetUpViewPager(ViewPager viewPager)
@@ -64,13 +68,20 @@ namespace Tax_Informer.Activities
             try
             {
                 var websiteGroup = Config.GetWebsite(currentWebsiteKey) as WebsiteGroup;
-                foreach (var child in websiteGroup.ChildWebsites)                
-                    adapter.AddFragment(new Fragments.OverviewFragment(child.HiddenKey), child.ChildName);                
+                foreach (var child in websiteGroup.ChildWebsites)
+                {
+                    MyLog.Log(this, $"Adding OverviewFragment {child.ChildName}...");
+                    adapter.AddFragment(new Fragments.OverviewFragment(child.HiddenKey), child.ChildName);
+                    MyLog.Log(this, $"Adding OverviewFragment {child.ChildName}...Done");
+                }               
+                    
             }
             catch (System.Exception)
             {
+                MyLog.Log(this, $"Adding OverviewFragment as single child --website key {currentWebsiteKey}...");
                 adapter.AddFragment(new Fragments.OverviewFragment(currentWebsiteKey), Config.GetWebsite(currentWebsiteKey).Name);
                 tabs.Visibility = ViewStates.Gone;
+                MyLog.Log(this, $"Adding OverviewFragment as single child --website key {currentWebsiteKey}...Done");
             }            
 
             viewPager.Adapter = adapter;

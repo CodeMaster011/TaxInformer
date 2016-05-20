@@ -48,6 +48,7 @@ namespace Tax_Informer.Core
                     //===================REQUEST CANCELING==================================
                     if (cancleRequest.Count > 0)
                     {
+                        MyLog.Log(this, "Cancel request" + "...");
                         var cancleReqPacket = cancleRequest.Dequeue();
 
                         var cUids = cancleReqPacket.DataInStringList;
@@ -63,40 +64,54 @@ namespace Tax_Informer.Core
                                 else tempRequest.Enqueue(tPacket);
                             }
                             pendingRequest = tempRequest;
-                        }
+                        } 
+                        MyLog.Log(this, "Cancel request" + "...Done");
                     }
                     //===================REQUEST PROCESSING==================================
-                    var packet = pendingRequest.Dequeue();
-                    var responseHandler = packet.OnlineModuleResponse;
-                    var requestedUrl = packet.Url;
-
-                    try
+                    if (pendingRequest.Count > 0)
                     {
-                        if (isStringFileLink(requestedUrl))
-                        {
-                            Log.Debug("Online Module:", $"Downloading (string) url {requestedUrl}");
+                        var packet = pendingRequest.Dequeue();
+                        var responseHandler = packet.OnlineModuleResponse;
+                        var requestedUrl = packet.Url;
 
-                            string result = Helper.DownloadFile(requestedUrl);
-                            packet.DataInString = result;
-                        }
-                        else
+                        MyLog.Log(this, $"Processing request url {requestedUrl}" + "...");
+                        try
                         {
-                            //not a string file use external links to view the item
-                            if (!System.IO.Directory.Exists(TempDirectory)) System.IO.Directory.CreateDirectory(TempDirectory);
-                            string extrnalLink = null;
-                            Helper.DownloadFile(requestedUrl, extrnalLink = $"{TempDirectory}/{Guid.NewGuid().ToString()}.pdf");
+                            if (isStringFileLink(requestedUrl))
+                            {
+                                Log.Debug("Online Module:", $"Downloading (string) url {requestedUrl}");
 
-                            packet.DataInString = null;
-                            packet.ExtrnalLink = extrnalLink;                            
+                                MyLog.Log(this, $"Downloading string file url {requestedUrl}" + "...");
+                                string result = Helper.DownloadFile(requestedUrl);
+                                packet.DataInString = result; 
+                                MyLog.Log(this, $"Downloading string file url {requestedUrl}" + "...Done");
+                            }
+                            else
+                            {
+                                //not a string file use external links to view the item
+                                MyLog.Log(this, $"Downloading non-string file url {requestedUrl}" + "...");
+                                if (!System.IO.Directory.Exists(TempDirectory)) System.IO.Directory.CreateDirectory(TempDirectory);
+                                string extrnalLink = ($"{TempDirectory}/{Guid.NewGuid().ToString()}.pdf");
+                                MyLog.Log(this, $"Download file src=> {requestedUrl} \t des=>{extrnalLink}" + "...");
+
+                                Helper.DownloadFile(requestedUrl, extrnalLink); 
+                                MyLog.Log(this, $"Download file src=> {requestedUrl} \t des=>{extrnalLink}" + "...Done");
+
+                                packet.DataInString = null;
+                                packet.ExtrnalLink = extrnalLink; 
+                                MyLog.Log(this, $"Downloading non-string file url {requestedUrl}" + "...Done");
+                            }
+                            Log.Debug("Online Module:", $"Making processed callback for url {requestedUrl}");
+                            responseHandler.RequestProcessedCallback(packet);
                         }
-                        Log.Debug("Online Module:", $"Making processed callback for url {requestedUrl}");
-                        responseHandler.RequestProcessedCallback(packet);
-                    }
-                    catch (Exception ex)
-                    {
-                        packet.Error = ex.Message;
-                        responseHandler.RequestProcessingError(packet);
-                    }
+                        catch (Exception ex)
+                        { 
+                            MyLog.Log(this, "--Error " + ex.Message);
+                            packet.Error = ex.Message;
+                            responseHandler.RequestProcessingError(packet);
+                        } 
+                        MyLog.Log(this, $"Processing request url {requestedUrl}" + "...Done");
+                    }                    
                 }
                 catch (Exception) { }
                 Thread.Sleep(1);

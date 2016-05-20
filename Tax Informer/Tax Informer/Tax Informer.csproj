@@ -128,6 +128,7 @@
     <Compile Include="Core\Website.cs" />
     <Compile Include="Core\RequestPacket.cs" />
     <Compile Include="Core\RunOnUI.cs" />
+    <Compile Include="MyLog.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Libs\SQLite.cs" />
