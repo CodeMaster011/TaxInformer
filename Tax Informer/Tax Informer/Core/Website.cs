@@ -49,6 +49,7 @@ namespace Tax_Informer.Core
         public abstract ArticalOverview[] ReadIndexPage(string url, HtmlAgilityPack.HtmlDocument doc, out string nextPageUrl);
 
         public abstract Artical ReadArtical(ArticalOverview overview, HtmlAgilityPack.HtmlDocument doc);
+        public virtual Artical ReadArticalExtrnal(ArticalOverview overview, string extrnalLink) => null;
 
         public virtual ArticalOverview[] ReadAuthor(Author author, HtmlAgilityPack.HtmlDocument doc, out string nextPageUrl)
         {

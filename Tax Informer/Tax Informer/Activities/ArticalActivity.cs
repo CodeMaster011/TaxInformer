@@ -35,7 +35,7 @@ namespace Tax_Informer.Activities
         private DrawerLayout navDrawerLayout = null;
         private LinearLayout headerLayout = null;
         private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
-        //private WebView webview = null;
+        private WebView articalContentWebview = null;
         private TextView articalContentTextview = null;
         private other.ObservableScrollView scrollView = null;
         private other.FloatingActionButton floatingButton = null;
@@ -61,14 +61,24 @@ namespace Tax_Informer.Activities
         {
             currentArtical = artical;//cache the data
 
-            //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
-            //webview.Settings.DefaultFontSize = 20;
-            articalContentTextview.Gravity = GravityFlags.Left;
-            articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
-            articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
+            if (string.IsNullOrEmpty(artical.ExternalFileLink))
+            {
+                articalContentTextview.Gravity = GravityFlags.Left;
+                articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
+                articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
-            adapter.NotifyDataSetChanged();
+                adapter.NotifyDataSetChanged();
 
+                articalContentTextview.Visibility = ViewStates.Visible;
+                articalContentWebview.Visibility = ViewStates.Gone;
+            }
+            else
+            {
+                articalContentWebview.LoadUrl("file:///android_asset/PDFViewer/index.html?file=" + System.Net.WebUtility.UrlDecode(artical.ExternalFileLink));
+                articalContentWebview.Settings.DefaultFontSize = 20;
+                articalContentTextview.Visibility = ViewStates.Gone;
+                articalContentWebview.Visibility = ViewStates.Visible;
+            }
             //if (artical.RelatedPosts != null)
             //    gridview.LayoutParameters.Height = artical.RelatedPosts.Length * dpToPx(70);
 
@@ -118,9 +128,13 @@ namespace Tax_Informer.Activities
 
             currentWebsite = Config.GetWebsite(currentWebsiteKey);
 
-            //webview = FindViewById<WebView>(Resource.Id.contentWebView);
-            //webview.Settings.DefaultFontSize = 20;
-            //webview.Settings.BuiltInZoomControls = true;
+            articalContentWebview = FindViewById<WebView>(Resource.Id.articalContentWebView);
+            articalContentWebview.Settings.DefaultFontSize = 20;
+            articalContentWebview.Settings.BuiltInZoomControls = true;
+            articalContentWebview.Settings.JavaScriptEnabled = true;
+            articalContentWebview.Settings.AllowFileAccessFromFileURLs = true;
+            articalContentWebview.Settings.AllowUniversalAccessFromFileURLs = true;
+            articalContentWebview.Visibility = ViewStates.Gone;
 
             ChangeStatusBarColor(Window, currentWebsite.Color);
 

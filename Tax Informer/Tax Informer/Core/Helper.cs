@@ -13,12 +13,12 @@ namespace Tax_Informer
 {
     public static class Helper
     {
-        public static string DownloadFile(string srcUrl, string desPath)
+        public static bool DownloadFile(string srcUrl, string desPath)
         {
             Stream input = null;
             FileStream output = null;
             HttpURLConnection connection = null;
-            string result = string.Empty;
+            bool result = true;
 
             try
             {
@@ -54,7 +54,7 @@ namespace Tax_Informer
                     //    return null;
                     //}
                     Log.Debug("State=Read", "Reading from web");
-                    count = input.Read(data, 0, data.Length - 1);   //read data from web
+                    count = input.Read(data, 0, data.Length);   //read data from web
 
                     total += count;
                     // publishing the progress....
@@ -70,7 +70,8 @@ namespace Tax_Informer
             }
             catch (Exception ex)
             {
-                throw ex;
+                result = false;
+                throw ex;                
             }
             finally
             {
@@ -125,7 +126,7 @@ namespace Tax_Informer
                     //    return null;
                     //}
                     Log.Debug("State=Read", "Reading from web");
-                    count = input.Read(data, 0, data.Length - 1);   //read data from web
+                    count = input.Read(data, 0, data.Length);   //read data from web
 
                     total += count;
                     // publishing the progress....

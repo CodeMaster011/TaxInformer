@@ -32,8 +32,11 @@ namespace Tax_Informer
         {
             base.OnCreate(bundle);
 
-            SetContentView(Resource.Layout.Main);
+            MyGlobal.applicationContext = this;
 
+            SetContentView(Resource.Layout.Main);
+            //SetContentView(Resource.Layout.artical);
+            //return;
             MyGlobal.ChangeStatusBarColor(Window, "#673AB7");
             toolBar = FindViewById<SupportToolBar>(Resource.Id.mainToolbar);
             toolBar.Title = "Tax Informer";

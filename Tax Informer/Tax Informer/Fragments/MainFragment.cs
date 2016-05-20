@@ -45,7 +45,7 @@ namespace Tax_Informer.Fragments
         }
         private void Adapter_OnItemClick(object sender, string websiteKey)
         {
-            MyGlobal.StartActivityOverview(Context, websiteKey);
+            MyGlobal.StartActivityOverview(this.Activity, websiteKey);
         }
 
 

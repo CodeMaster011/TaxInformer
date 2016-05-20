@@ -15,6 +15,8 @@ namespace Tax_Informer
 {
     internal static class MyGlobal
     {
+        public static Context applicationContext = null;
+        public static string TempDirectory = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/TaxInformer/Temp";
         public static bool IsRunning = true;
         public static int NextPageContentNumber = 5;
         public static IAnalysisModule analysisModule = new AnalysisModule();

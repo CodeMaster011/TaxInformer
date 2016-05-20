@@ -3,12 +3,11 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/articalDrawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">  
+    android:layout_height="match_parent">
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-      
         <com.refractored.fab.ObservableScrollView
             android:minWidth="25px"
             android:minHeight="25px"
@@ -76,8 +75,8 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:textColor="#000000" />
-              <WebView
-                  android:id="@+id/articalContentWebView"
+                <WebView
+                    android:id="@+id/articalContentWebView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone" />

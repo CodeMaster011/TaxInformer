@@ -24,6 +24,8 @@ namespace Tax_Informer.Core
         public ArticalOverview[] RelatedPosts { get; set; } = null;
         public string MyLink { get; set; } = string.Empty;
 
+        public string ExternalFileLink { get; set; } = string.Empty;
+
         public Bundle ToBundle()
         {
             //TODO: Covert artical to bundle

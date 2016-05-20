@@ -93,7 +93,7 @@ namespace Tax_Informer.Fragments
         {
             database.UpdateIsSeen(UidGenerator(), articalOverview);//TODO: Consider a better place for updating is seen list
 
-            StartActivityArtical(this.Context, articalOverview, websiteKey);
+            StartActivityArtical(applicationContext, articalOverview, websiteKey);
         }
 
         public override void OnResume()

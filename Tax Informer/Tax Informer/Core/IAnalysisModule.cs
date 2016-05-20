@@ -49,10 +49,15 @@ namespace Tax_Informer.Core
         }
         
         private void originalResponse(RequestPacket packet)
-        {
+        {            
             var data = packet.DataInString;
-            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(data);
+            HtmlAgilityPack.HtmlDocument doc = null;
+
+            if (!string.IsNullOrEmpty(data))
+            {
+                doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(data);
+            }            
 
             var currentWebsite = Config.GetWebsite(packet.WebsiteKey);
 
@@ -60,9 +65,15 @@ namespace Tax_Informer.Core
             if(overviewType == OverviewType.Null)
             {
                 //Artical
+                Artical artical = null;
+                if (doc != null)
+                    artical = currentWebsite.ReadArtical(packet.Tag as ArticalOverview, doc);
+                else
+                    artical = currentWebsite.ReadArticalExtrnal(packet.Tag as ArticalOverview, packet.ExtrnalLink);
+                                
                 packet.AnalisisModuleResponseUiArtical
                     .ArticalProcessedCallback
-                        (packet.Uid, packet.Url, currentWebsite.ReadArtical(packet.Tag as ArticalOverview, doc));
+                        (packet.Uid, packet.Url, artical);
             }
             else
             {

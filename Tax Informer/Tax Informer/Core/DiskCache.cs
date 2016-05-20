@@ -37,7 +37,7 @@ namespace Tax_Informer.Core
         {
             try
             {
-                string path = CachePhysicalLocation + encodeUrl(url);
+                string path = CachePhysicalLocation + EncodeUrl(url);
                 if (!File.Exists(path)) return null;
                 //BitmapFactory.Options options = new BitmapFactory.Options();
                 //options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -56,7 +56,7 @@ namespace Tax_Informer.Core
             string result = string.Empty;
             try
             {
-                string path = CachePhysicalLocation + encodeUrl(url);
+                string path = CachePhysicalLocation + EncodeUrl(url);
                 if (!File.Exists(path)) return string.Empty;
 
                 fStream = new StreamReader(path);
@@ -72,7 +72,7 @@ namespace Tax_Informer.Core
 
         public bool IsKeyExist(string url)
         {
-            string path = CachePhysicalLocation + encodeUrl(url);
+            string path = CachePhysicalLocation + EncodeUrl(url);
             return File.Exists(path);
         }
 
@@ -110,7 +110,7 @@ namespace Tax_Informer.Core
             bool result = true;
             try
             {
-                string path = CachePhysicalLocation + encodeUrl(url);
+                string path = CachePhysicalLocation + EncodeUrl(url);
                 if (File.Exists(path))
                 {
                     if (update) File.Delete(path);
@@ -138,7 +138,7 @@ namespace Tax_Informer.Core
             bool result = true;
             try
             {
-                string path = CachePhysicalLocation + encodeUrl(url);
+                string path = CachePhysicalLocation + EncodeUrl(url);
                 if (File.Exists(path))
                 {
                     if (update) File.Delete(path);
@@ -168,13 +168,13 @@ namespace Tax_Informer.Core
             if (!Directory.Exists(CachePhysicalLocation)) Directory.CreateDirectory(CachePhysicalLocation);
         }
 
-        private string encodeUrl(string key) => key.Replace('/', '-').Replace(':','-');
+        public static string EncodeUrl(string key) => key.Replace('/', '-').Replace(':','-');
 
         public bool Remove(string url)
         {
             try
             {
-                var path = CachePhysicalLocation + encodeUrl(url);
+                var path = CachePhysicalLocation + EncodeUrl(url);
                 if (File.Exists(path)) File.Delete(url);
                 else return false;
                 return true;

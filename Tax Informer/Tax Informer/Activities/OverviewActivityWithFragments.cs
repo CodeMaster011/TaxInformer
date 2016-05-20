@@ -36,7 +36,7 @@ namespace Tax_Informer.Activities
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.Main);
-
+            
             if (Intent.Extras != null && Intent.Extras.ContainsKey(PassWebsiteKey))
                 currentWebsiteKey = Intent.Extras.GetString(PassWebsiteKey);
             else { Finish(); return; }

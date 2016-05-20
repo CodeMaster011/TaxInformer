@@ -67,16 +67,28 @@ namespace Tax_Informer.Core
                     }
                     //===================REQUEST PROCESSING==================================
                     var packet = pendingRequest.Dequeue();
-
+                    var responseHandler = packet.OnlineModuleResponse;
                     var requestedUrl = packet.Url;
-                    var responseHandler = packet.OnlineModuleResponse;                    
+
                     try
                     {
-                        Log.Debug("Online Module:", $"Downloading (string) url {requestedUrl}");
+                        if (isStringFileLink(requestedUrl))
+                        {
+                            Log.Debug("Online Module:", $"Downloading (string) url {requestedUrl}");
 
-                        string result = Helper.DownloadFile(requestedUrl);
-                        packet.DataInString = result;
+                            string result = Helper.DownloadFile(requestedUrl);
+                            packet.DataInString = result;
+                        }
+                        else
+                        {
+                            //not a string file use external links to view the item
+                            if (!System.IO.Directory.Exists(TempDirectory)) System.IO.Directory.CreateDirectory(TempDirectory);
+                            string extrnalLink = null;
+                            Helper.DownloadFile(requestedUrl, extrnalLink = $"{TempDirectory}/{Guid.NewGuid().ToString()}.pdf");
 
+                            packet.DataInString = null;
+                            packet.ExtrnalLink = extrnalLink;                            
+                        }
                         Log.Debug("Online Module:", $"Making processed callback for url {requestedUrl}");
                         responseHandler.RequestProcessedCallback(packet);
                     }
@@ -90,7 +102,14 @@ namespace Tax_Informer.Core
                 Thread.Sleep(1);
             }
         }
-
+        private string[] stringFileExtentions = new string[] { ".html", ".php", ".asp", ".aspx" };
+        private bool isStringFileLink(string url)
+        {
+            foreach (var s in stringFileExtentions)            
+                if (url.Contains(s)) return true;
+            if (url.EndsWith("/")) return true;    //Links like http://www.charteredclub.com/category/tax/
+            return false;
+        }
         public OnlineModule()
         {
             Thread th = new Thread(processRequest);
