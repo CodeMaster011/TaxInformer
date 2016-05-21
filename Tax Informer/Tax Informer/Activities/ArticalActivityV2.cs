@@ -160,27 +160,41 @@ namespace Tax_Informer.Activities
         private void updateArtical(Artical artical)
         {
             MyLog.Log(this, nameof(updateArtical) + "...");
-            currentArtical = artical;//cache the data
-
-            if (string.IsNullOrEmpty(artical.ExternalFileLink))
+            if (artical != null)
             {
-                MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...");
-                articalContentWebview.LoadData(artical.HtmlText, "text/html", "utf-8");
-                MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...Done");                
+                MyLog.Log(this, "Updating db isSeen history" + "...");
+                database.UpdateIsSeen(UidGenerator(), articalOverview);//TODO: Sent a notification to overview fragment as the data shown successful
+                MyLog.Log(this, "Updating db isSeen history" + "...Done");
+
+                currentArtical = artical;//cache the data
+
+                if (string.IsNullOrEmpty(artical.ExternalFileLink))
+                {
+                    MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...");
+                    articalContentWebview.LoadData(artical.HtmlText, "text/html", "utf-8");
+                    MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...Done");
+                }
+                else
+                {
+                    MyLog.Log(this, $"Updating artical data extrnal url {artical.MyLink} \t link {artical.ExternalFileLink}" + "...");
+                    articalContentWebview.LoadUrl("file:///android_asset/pdfviewer/index.html?file=" + System.Net.WebUtility.UrlDecode(artical.ExternalFileLink));
+                    MyLog.Log(this, $"Updating artical data extrnal url {artical.MyLink} \t link {artical.ExternalFileLink}" + "...Done");
+                }
+
+                articalContentWebview.Settings.DefaultFontSize = 20;
+                loadingTextView.Visibility = ViewStates.Gone;
+                articalContentWebview.Visibility = ViewStates.Visible;
+                Title = artical.Title;
+                articalDateTextview.Text = GetHumanReadableDate(artical.Date);
+                articalTitleTextview.Text = artical.Title;
+                toolBar.Title = artical.Title;
             }
             else
             {
-                MyLog.Log(this, $"Updating artical data extrnal url {artical.MyLink} \t link {artical.ExternalFileLink}" + "...");
-                articalContentWebview.LoadUrl("file:///android_asset/pdfviewer/index.html?file=" + System.Net.WebUtility.UrlDecode(artical.ExternalFileLink));                
-                MyLog.Log(this, $"Updating artical data extrnal url {artical.MyLink} \t link {artical.ExternalFileLink}" + "...Done");
+                loadingTextView.Text = "Unable to load artical";
+                loadingTextView.SetTextColor(Android.Graphics.Color.Red);
             }
             
-            articalContentWebview.Settings.DefaultFontSize = 20;
-            loadingTextView.Visibility = ViewStates.Gone;
-            articalContentWebview.Visibility = ViewStates.Visible;
-            Title = artical.Title;
-            articalDateTextview.Text = GetHumanReadableDate(artical.Date);
-            articalTitleTextview.Text = artical.Title;
             MyLog.Log(this, nameof(updateArtical) + "...Done");
         }
     }

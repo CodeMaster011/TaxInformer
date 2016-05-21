@@ -106,11 +106,6 @@ namespace Tax_Informer.Fragments
 
         private void RecyclerView_OnItemClick(object sender, ArticalOverview articalOverview)
         {
-
-            MyLog.Log(this, "Updating db isSeen history" + "...");
-            database.UpdateIsSeen(UidGenerator(), articalOverview);//TODO: Consider a better place for updating is seen list  
-            MyLog.Log(this, "Updating db isSeen history" + "...Done");
-
             MyLog.Log(this, $"Starting activity artical" + "...");
             StartActivityArtical(applicationContext, articalOverview, websiteKey);
             MyLog.Log(this, $"Starting activity artical" + "...Done");

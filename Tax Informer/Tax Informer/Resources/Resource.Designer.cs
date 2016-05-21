@@ -2016,8 +2016,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06001e
 			public const int always = 2131099678;
 			
-			// aapt resource value: 0x7f06007d
-			public const int articalContainerNestedScrollView = 2131099773;
+			// aapt resource value: 0x7f06007c
+			public const int articalContainerNestedScrollView = 2131099772;
 			
 			// aapt resource value: 0x7f060071
 			public const int articalContentTextView = 2131099761;
@@ -2037,8 +2037,8 @@ namespace Tax_Informer
 			// aapt resource value: 0x7f06006c
 			public const int articalHeaderLinearLayout = 2131099756;
 			
-			// aapt resource value: 0x7f06007c
-			public const int articalLoadingTextView = 2131099772;
+			// aapt resource value: 0x7f06007d
+			public const int articalLoadingTextView = 2131099773;
 			
 			// aapt resource value: 0x7f060074
 			public const int articalNavigationLinearLayout = 2131099764;
