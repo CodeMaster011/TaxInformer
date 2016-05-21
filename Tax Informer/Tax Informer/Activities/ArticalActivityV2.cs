@@ -139,7 +139,7 @@ namespace Tax_Informer.Activities
             database.MakeOffline(UidGenerator(), currentWebsiteKey, currentArtical, articalOverview);   //request to make data offline  
             MyLog.Log(this, "Making artical offline" + "...Done");
 
-            Snackbar.Make(sender as View, "Offline is now available", (int)ToastLength.Short).Show();
+            Snackbar.Make(appBarLayout, "Offline is now available", (int)ToastLength.Short).Show();
 
             MyLog.Log(this, nameof(FloatingButton_Click) + "...Done");
         }

@@ -143,6 +143,7 @@ namespace Tax_Informer.Core
         }
         private void operationMakeOffline(string websiteKey, Artical artical, ArticalOverview overview)
         {
+            //TODO: Find a way to save the pdf data in a different folder for future use as folder
             if (db == null) throw new InvalidOperationException("Database is not created yet.");
 
             overview.IsDatabaseConfirmed_Offline = true;
@@ -325,6 +326,7 @@ namespace Tax_Informer.Core
             [Indexed]
             public string OfflineAvailableOn { get; set; } = string.Empty;
             public string SeenOn { get; set; } = null;
+            public string ExtrnalLinks { get; set; } = null;
             public string WebsiteKey { get; set; } = null;
 
             public ArticalOverviewOffline ToArticalOverviewOffline()
@@ -348,8 +350,9 @@ namespace Tax_Informer.Core
                 {
                     MyLink = LinkOfActualArtical,
                     Title = Title,
-                    HtmlText  =HtmlText,
-                    Date = Date
+                    HtmlText  = HtmlText,
+                    Date = Date,
+                    ExternalFileLink = ExtrnalLinks
                 };
             }
             public static OfflineTable New(string websiteKey, Artical artical, ArticalOverview overview)
@@ -362,6 +365,7 @@ namespace Tax_Informer.Core
                     Date =  overview.Date,
                     SeenOn = overview.SeenOn,
                     HtmlText = artical.HtmlText,
+                    ExtrnalLinks = artical.ExternalFileLink,
                     OfflineAvailableOn = DateTime.Today.ToString("yyyyMMdd"),
                     WebsiteKey = websiteKey
                 };
