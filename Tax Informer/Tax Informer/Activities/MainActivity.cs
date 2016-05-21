@@ -31,8 +31,13 @@ namespace Tax_Informer
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+            MyLog.Log(this, $"OnCreate...");
+
+            MyGlobal.applicationContext = this;
 
             SetContentView(Resource.Layout.Main);
+            //SetContentView(Resource.Layout.artical_layout_v2);
+            //return;
 
             MyGlobal.ChangeStatusBarColor(Window, "#673AB7");
             toolBar = FindViewById<SupportToolBar>(Resource.Id.mainToolbar);
@@ -42,9 +47,12 @@ namespace Tax_Informer
 
             ViewPager viewPager = FindViewById<ViewPager>(Resource.Id.mainViewpager);
 
+            MyLog.Log(this, "Implementing Fragments...");
             SetUpViewPager(viewPager);
-
+            MyLog.Log(this, "Implementing Fragments...Done");
             tabs.SetupWithViewPager(viewPager);
+
+            MyLog.Log(this, $"OnCreate...Done");
         }
         
 

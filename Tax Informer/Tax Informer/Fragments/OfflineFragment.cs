@@ -40,10 +40,13 @@ namespace Tax_Informer.Fragments
             base.OnCreate(savedInstanceState);
 
             // Create your fragment here
+            MyLog.Log(this, "Fragments creating...");
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            MyLog.Log(this, "Fragments view creating...");
+
             swipeRefreshLayout = inflater.Inflate(Resource.Layout.main_offline_list, container, false) as SwipeRefreshLayout;
             swipeRefreshLayout.Refresh += SwipeRefreshLayout_Refresh;
             swipeRefreshLayout.SetColorSchemeColors(new int[] {
@@ -54,20 +57,30 @@ namespace Tax_Informer.Fragments
             recyclerView.SetAdapter(adapter = new RecyAdapter());
             adapter.OnItemClick += Adapter_OnItemClick;
 
+            MyLog.Log(this, "requesting db for GetAllOfflineArticalList...");
             MyGlobal.database.GetAllOfflineArticalList(MyGlobal.UidGenerator(), this);
+            MyLog.Log(this, "requesting db for GetAllOfflineArticalList...Done");
 
+            MyLog.Log(this, "Fragments view creating...Done");
             return swipeRefreshLayout;
         }
 
         private void SwipeRefreshLayout_Refresh(object sender, EventArgs e)
         {
+            MyLog.Log(this, "Refreshing...");
             swipeRefreshLayout.Refreshing = true;
+
+            MyLog.Log(this, "requesting db for GetAllOfflineArticalList as refreshing...");
             MyGlobal.database.GetAllOfflineArticalList(MyGlobal.UidGenerator(), this);
+            MyLog.Log(this, "requesting db for GetAllOfflineArticalList as refreshing...Done");
         }
 
         private void Adapter_OnItemClick(object sender, ArticalOverviewOffline item)
         {
+            MyLog.Log(this, $"Adapter OnItemClick - websiteKey : {item.WebsiteKey} \t url : {item.LinkOfActualArtical}");
+            MyLog.Log(this, $"starting artical offline activity url {item.LinkOfActualArtical}...");
             MyGlobal.StartActivityArtical(this.Context, item, item.WebsiteKey, true);
+            MyLog.Log(this, $"starting artical offline activity url {item.LinkOfActualArtical}...Done");
         }
 
         private class RecyAdapter : RecyclerView.Adapter

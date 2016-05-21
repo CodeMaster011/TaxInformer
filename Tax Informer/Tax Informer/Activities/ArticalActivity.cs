@@ -22,7 +22,7 @@ using Android.Support.V7.App;
 
 namespace Tax_Informer.Activities
 {
-    [Activity(Label = "ArticalActivity")]
+    [Activity(Label = "ArticalActivity")]    
     internal class ArticalActivity : AppCompatActivity, IUiArticalResponseHandler
     {
         public const string PassArticalOverviewObj = nameof(PassArticalOverviewObj);
@@ -35,7 +35,7 @@ namespace Tax_Informer.Activities
         private DrawerLayout navDrawerLayout = null;
         private LinearLayout headerLayout = null;
         private TextView articalTitleTextview = null, articalDateTextview = null, articalWebsiteComicTextview = null;
-        //private WebView webview = null;
+        private WebView articalContentWebview = null;
         private TextView articalContentTextview = null;
         private other.ObservableScrollView scrollView = null;
         private other.FloatingActionButton floatingButton = null;
@@ -59,27 +59,48 @@ namespace Tax_Informer.Activities
         }
         private void updateArtical(Artical artical)
         {
+            MyLog.Log(this, nameof(updateArtical) + "...");
             currentArtical = artical;//cache the data
 
-            //webview.LoadData(artical.HtmlText, "text/html; charset=utf-8", null);
-            //webview.Settings.DefaultFontSize = 20;
-            articalContentTextview.Gravity = GravityFlags.Left;
-            articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
-            articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
+            if (string.IsNullOrEmpty(artical.ExternalFileLink))
+            {
+                //MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...");
+                //articalContentTextview.Gravity = GravityFlags.Left;
+                //articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
+                //articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
-            adapter.NotifyDataSetChanged();
+                //adapter.NotifyDataSetChanged();
 
+                //articalContentTextview.Visibility = ViewStates.Visible;
+                //if (articalContentWebview != null) articalContentWebview.Visibility = ViewStates.Gone; 
+                //MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...Done");
+
+                articalContentWebview.LoadData(artical.HtmlText, "text/html", "utf-8");
+                articalContentTextview.Visibility = ViewStates.Gone;
+                articalContentWebview.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                MyLog.Log(this, $"Updating artical data extrnal url {artical.MyLink} \t link {artical.ExternalFileLink}" + "...");
+                articalContentWebview.LoadUrl("file:///android_asset/pdfviewer/index.html?file=" + System.Net.WebUtility.UrlDecode(artical.ExternalFileLink));
+                articalContentWebview.Settings.DefaultFontSize = 20;
+                articalContentTextview.Visibility = ViewStates.Gone;
+                articalContentWebview.Visibility = ViewStates.Visible; 
+                MyLog.Log(this, $"Updating artical data extrnal url {artical.MyLink} \t link {artical.ExternalFileLink}" + "...Done");
+            }
             //if (artical.RelatedPosts != null)
             //    gridview.LayoutParameters.Height = artical.RelatedPosts.Length * dpToPx(70);
 
             Title = artical.Title;
             articalDateTextview.Text = GetHumanReadableDate(artical.Date);
-            articalTitleTextview.Text = artical.Title;
+            articalTitleTextview.Text = artical.Title; 
+            MyLog.Log(this, nameof(updateArtical) + "...Done");
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            MyLog.Log(this, nameof(OnCreate) + "...");
 
             SetContentView(Resource.Layout.artical);
 
@@ -89,6 +110,7 @@ namespace Tax_Informer.Activities
             Bundle extras = Intent.Extras;
             Website currentWebsite = null;
 
+            MyLog.Log(this, "Loading bundle data" + "...");
             if (extras != null && extras.ContainsKey(PassArticalOverviewObj))
                 articalOverview = new ArticalOverview(extras.GetBundle(PassArticalOverviewObj));
             else
@@ -109,18 +131,34 @@ namespace Tax_Informer.Activities
             {
                 Finish();
                 return;
-            }
+            } 
+            MyLog.Log(this, "Loading bundle data" + "...Done");
 
             if (!isOffline)
-                analysisModule.ReadArtical(UidGenerator(), currentWebsiteKey, articalOverview, this);  //make the request
+            {
+                MyLog.Log(this, $"Request artical data online url {articalOverview.LinkOfActualArtical}" + "...");
+                analysisModule.ReadArtical(UidGenerator(), currentWebsiteKey, articalOverview, this);  //make the request  
+                MyLog.Log(this, $"Request artical data online url {articalOverview.LinkOfActualArtical}" + "...Done");
+            }
+                
             else
-                database.GetArtical(UidGenerator(), articalOverview, this);
+            {
+                MyLog.Log(this, $"Requesting artical data offline url{articalOverview.LinkOfActualArtical}" + "...");
+                database.GetArtical(UidGenerator(), articalOverview, this); 
+                MyLog.Log(this, $"Requesting artical data offline url{articalOverview.LinkOfActualArtical}" + "...Done");
+            }
 
             currentWebsite = Config.GetWebsite(currentWebsiteKey);
 
-            //webview = FindViewById<WebView>(Resource.Id.contentWebView);
-            //webview.Settings.DefaultFontSize = 20;
-            //webview.Settings.BuiltInZoomControls = true;
+            MyLog.Log(this, "Loading webview" + "...");
+            articalContentWebview = FindViewById<WebView>(Resource.Id.articalContentWebView);
+            articalContentWebview.Settings.DefaultFontSize = 20;
+            articalContentWebview.Settings.BuiltInZoomControls = true;
+            articalContentWebview.Settings.JavaScriptEnabled = true;
+            articalContentWebview.Settings.AllowFileAccessFromFileURLs = true;
+            articalContentWebview.Settings.AllowUniversalAccessFromFileURLs = true;
+            articalContentWebview.Visibility = ViewStates.Gone; 
+            MyLog.Log(this, "Loading webview" + "...Done");
 
             ChangeStatusBarColor(Window, currentWebsite.Color);
 
@@ -152,26 +190,37 @@ namespace Tax_Informer.Activities
 
             optionOpenInBrowser = FindViewById<TextView>(Resource.Id.articalOptionOpenInBrowserTextView);
             optionOpenInBrowser.Click += OptionOpenInBrowser_Click;
-            floatingButton.Click += FloatingButton_Click;
+            floatingButton.Click += FloatingButton_Click; 
+            MyLog.Log(this, nameof(OnCreate) + "...Done");
         }
 
         private void FloatingButton_Click(object sender, EventArgs e)
         {
-            database.MakeOffline(UidGenerator(), currentWebsiteKey, currentArtical, articalOverview);   //request to make data offline
-            Snackbar.Make(sender as View, "Offline is now available", (int)ToastLength.Short).Show();
+            MyLog.Log(this, nameof(FloatingButton_Click) + "...");
+            MyLog.Log(this, "Making artical offline" + "...");
+            database.MakeOffline(UidGenerator(), currentWebsiteKey, currentArtical, articalOverview);   //request to make data offline  
+            MyLog.Log(this, "Making artical offline" + "...Done");
+            Snackbar.Make(sender as View, "Offline is now available", (int)ToastLength.Short).Show(); 
+            MyLog.Log(this, nameof(FloatingButton_Click) + "...Done");
         }
 
         private void OptionOpenInBrowser_Click(object sender, EventArgs e)
         {
+            MyLog.Log(this, nameof(OptionOpenInBrowser_Click) + "...");
             navDrawerLayout.CloseDrawer((int)GravityFlags.Right);
             Intent browserIntent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(currentArtical.MyLink));
-            StartActivity(browserIntent);
+            StartActivity(browserIntent); 
+            MyLog.Log(this, nameof(OptionOpenInBrowser_Click) + "...Done");
         }
 
         private void Gridview_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            navDrawerLayout.CloseDrawer((int)GravityFlags.Right);            
-            StartActivityArtical(this, currentArtical.RelatedPosts[e.Position], currentWebsiteKey);            
+            MyLog.Log(this, nameof(Gridview_ItemClick) + "...");
+            navDrawerLayout.CloseDrawer((int)GravityFlags.Right);
+            MyLog.Log(this, $"Starting activity artical url {currentArtical?.RelatedPosts?[e.Position]?.LinkOfActualArtical}" + "...");
+            StartActivityArtical(this, currentArtical.RelatedPosts[e.Position], currentWebsiteKey);  
+            MyLog.Log(this, $"Starting activity artical url {currentArtical?.RelatedPosts?[e.Position]?.LinkOfActualArtical}" + "...Done");
+            MyLog.Log(this, nameof(Gridview_ItemClick) + "...Done");
         }
 
         class GridviewAdapter : BaseAdapter

@@ -17,6 +17,7 @@ namespace Tax_Informer.Core
         public const string RequestPacketOverviewType = "overviewType";
         public const string RequestPacketOnlyOnline = "onlineOnly";
         public const string RequestPacketWebsiteKey = "websiteKey";
+        public const string RequestPacketExtranalLink = "extranalLink";
 
         public Dictionary<string, object> requestObjs = null;
 
@@ -72,6 +73,21 @@ namespace Tax_Informer.Core
                     throw new InvalidOperationException("The data already exist.");
                 else
                     requestObjs.Add(RequestPacketWebsiteKey, value);
+            }
+        }
+
+        public string ExtrnalLink
+        {
+            get
+            {
+                return Get<string>(RequestPacketExtranalLink);
+            }
+            set
+            {
+                if (requestObjs.ContainsKey(RequestPacketExtranalLink))
+                    throw new InvalidOperationException("The data already exist.");
+                else
+                    requestObjs.Add(RequestPacketExtranalLink, value);
             }
         }
 

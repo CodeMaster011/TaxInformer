@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\ArticalActivity.cs" />
+    <Compile Include="Activities\ArticalActivityV2.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\OfflineActivity.cs" />
     <Compile Include="Activities\OverviewActivity.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="Core\Website.cs" />
     <Compile Include="Core\RequestPacket.cs" />
     <Compile Include="Core\RunOnUI.cs" />
+    <Compile Include="MyLog.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Libs\SQLite.cs" />
@@ -137,6 +139,7 @@
     <Compile Include="Websites\TaxguruWebsite.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\data.json" />
     <None Include="packages.config" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
@@ -147,7 +150,7 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\artical.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\artical_relatedpost_single_item.axml">
       <SubType>AndroidResource</SubType>
@@ -169,6 +172,12 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\overview_cat_single_item.axml">
       <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\artical_layout_v2_title_bar.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\artical_layout_v2.axml">
+      <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +205,27 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\money.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\compatibility.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\customview.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\minimal.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\pdf.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\pdf.worker.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\pdfviewer\pdffile.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets')" />

@@ -15,6 +15,9 @@ namespace Tax_Informer
 {
     internal static class MyGlobal
     {
+        public static bool IsLogEnable = false;
+        public static Context applicationContext = null;
+        public static string TempDirectory = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/TaxInformer/Temp";
         public static bool IsRunning = true;
         public static int NextPageContentNumber = 5;
         public static IAnalysisModule analysisModule = new AnalysisModule();
@@ -71,10 +74,10 @@ namespace Tax_Informer
         public static void StartActivityArtical(Context context, ArticalOverview overview, string websiteKey, bool isOfflineArtical = false)
         {
             var b = overview.ToBundle();
-            Intent intent = new Intent(context, typeof(Activities.ArticalActivity));
-            intent.PutExtra(Activities.ArticalActivity.PassArticalOverviewObj, b );
-            intent.PutExtra(Activities.ArticalActivity.PassWebsiteKey, websiteKey);
-            intent.PutExtra(Activities.ArticalActivity.PassIsOffline, isOfflineArtical);
+            Intent intent = new Intent(context, typeof(Activities.ArticalActivityV2));
+            intent.PutExtra(Activities.ArticalActivityV2.PassArticalOverviewObj, b );
+            intent.PutExtra(Activities.ArticalActivityV2.PassWebsiteKey, websiteKey);
+            intent.PutExtra(Activities.ArticalActivityV2.PassIsOffline, isOfflineArtical);
             context.StartActivity(intent);
         }
         public static void StartActivityOffline(Context context)

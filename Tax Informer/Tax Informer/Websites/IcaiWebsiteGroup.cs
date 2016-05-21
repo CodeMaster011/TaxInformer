@@ -94,6 +94,13 @@ namespace Tax_Informer.Websites
             return data.Count > 0 ? data.ToArray() : null;
         }
 
+        public override Artical ReadArticalExtrnal(ArticalOverview overview, string extrnalLink)
+        {
+            var artical = overview.ToArtical();
+            artical.ExternalFileLink = extrnalLink;
+            return artical;
+        }
+
         private sealed class WhatsNewChild : ChildWebsite
         {
             public override string IndexPageLink { get; } = "http://www.icai.org/new_category.html?c_id=240";
@@ -102,6 +109,8 @@ namespace Tax_Informer.Websites
             public override Artical ReadArtical(ArticalOverview overview, HtmlDocument doc) => Parent.ReadArtical(overview, doc);
 
             public override ArticalOverview[] ReadIndexPage(string url, HtmlDocument doc, out string nextPageUrl) => Parent.ReadIndexPage(url, doc, out nextPageUrl);
+
+            public override Artical ReadArticalExtrnal(ArticalOverview overview, string extrnalLink) => Parent.ReadArticalExtrnal(overview, extrnalLink);
 
             protected override void RestoreState(Dictionary<string, object> state) { }
         }
@@ -153,7 +162,7 @@ namespace Tax_Informer.Websites
 
             public override ArticalOverview[] ReadCategory(Category category, HtmlDocument doc, out string nextPageUrl) => Parent.ReadIndexPage(category.Link, doc, out nextPageUrl);
             public override ArticalOverview[] ReadIndexPage(string url, HtmlDocument doc, out string nextPageUrl) => Parent.ReadIndexPage(url, doc, out nextPageUrl);
-
+            public override Artical ReadArticalExtrnal(ArticalOverview overview, string extrnalLink) => Parent.ReadArticalExtrnal(overview, extrnalLink);
             protected override void RestoreState(Dictionary<string, object> state) { }
         }
     }

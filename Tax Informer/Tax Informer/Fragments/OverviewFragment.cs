@@ -36,10 +36,12 @@ namespace Tax_Informer.Fragments
 
         public OverviewFragment(string websiteKey)
         {
+            MyLog.Log(this, $"OnCreate...");
             this.websiteKey = websiteKey;
             website = Config.GetWebsite(websiteKey);
 
             refreshingLink = website.IndexPageLink;
+            MyLog.Log(this, $"OnCreate...Done");
         }
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -50,6 +52,8 @@ namespace Tax_Informer.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            MyLog.Log(this, $"OnCreateView...");
+
             swipeRefLayout = inflater.Inflate(Resource.Layout.main_offline_list, container, false) as SwipeRefreshLayout;
             swipeRefLayout.Refreshing = true;
             swipeRefLayout.Refresh += SwipeRefLayout_Refresh;
@@ -65,35 +69,51 @@ namespace Tax_Informer.Fragments
 
             if (website.Categories == null)
             {
+                MyLog.Log(this, $"Requesting index page data from analysisModule url {website.IndexPageLink}...");
                 browsingContext = OverviewType.IndexPage;
                 analysisModule.ReadIndexPage(refreshingRequestUid = UidGenerator(), websiteKey, website.IndexPageLink, this);
+                MyLog.Log(this, $"Requesting index page data from analysisModule url {website.IndexPageLink}...Done");
             }
             else
             {
+                MyLog.Log(this, $"Requesting index page data from analysisModule category {website?.Categories[0]?.Link}...");
                 browsingContext = OverviewType.Category;
                 refreshingLink = website.Categories[0].Link;
                 analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), websiteKey, website.Categories[0], this);
-            }            
+                MyLog.Log(this, $"Requesting index page data from analysisModule category {website?.Categories[0]?.Link}...Done");
+            }
 
+            MyLog.Log(this, $"OnCreateView...Done");
             return swipeRefLayout;
         }
 
         private void OnCategorySelected(object sender, Category category)
         {
+            MyLog.Log(this, nameof(OnCategorySelected));
+            
             if (browsingContext == OverviewType.Category && refreshingLink == category.Link) return;
             swipeRefLayout.Refreshing = true;
             browsingContext = OverviewType.Category;
             refreshingLink = category.Link;
-            analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), websiteKey, category, this);
+            MyLog.Log(this, $"Read category url {refreshingLink}" + "...");
+            analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), websiteKey, category, this); 
+            MyLog.Log(this, $"Read category url {refreshingLink}" + "...Done");
             adapter.data = null;
             adapter.NotifyDataSetChanged();
+
+            MyLog.Log(this, nameof(OnCategorySelected) + "...Done");
         }
 
         private void RecyclerView_OnItemClick(object sender, ArticalOverview articalOverview)
         {
-            database.UpdateIsSeen(UidGenerator(), articalOverview);//TODO: Consider a better place for updating is seen list
 
-            StartActivityArtical(this.Context, articalOverview, websiteKey);
+            MyLog.Log(this, "Updating db isSeen history" + "...");
+            database.UpdateIsSeen(UidGenerator(), articalOverview);//TODO: Consider a better place for updating is seen list  
+            MyLog.Log(this, "Updating db isSeen history" + "...Done");
+
+            MyLog.Log(this, $"Starting activity artical" + "...");
+            StartActivityArtical(applicationContext, articalOverview, websiteKey);
+            MyLog.Log(this, $"Starting activity artical" + "...Done");
         }
 
         public override void OnResume()
@@ -106,6 +126,7 @@ namespace Tax_Informer.Fragments
         {
             if (refreshingRequestUid != string.Empty) return;
 
+            MyLog.Log(this, nameof(SwipeRefLayout_Refresh));
             swipeRefLayout.Refreshing = true;
             switch (browsingContext)
             {
@@ -114,31 +135,39 @@ namespace Tax_Informer.Fragments
                 case OverviewType.UNKNOWN:
                     break;
                 case OverviewType.IndexPage:
-                    analysisModule.ReadIndexPage(refreshingRequestUid = UidGenerator(), websiteKey, refreshingLink, this, true);
+                    MyLog.Log(this, $"Requesting index page data url {refreshingLink}" + "...");
+                    analysisModule.ReadIndexPage(refreshingRequestUid = UidGenerator(), websiteKey, refreshingLink, this, true); 
+                    MyLog.Log(this, $"Requesting index page data url {refreshingLink}" + "...Done");
                     break;
                 case OverviewType.Author:
                     break;
                 case OverviewType.Category:
-                    analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), websiteKey, new Category() { Link = refreshingLink }, this);
+                    MyLog.Log(this, $"Requesting category data {refreshingLink}" + "...");
+                    analysisModule.ReadCategory(refreshingRequestUid = UidGenerator(), websiteKey, new Category() { Link = refreshingLink }, this); 
+                    MyLog.Log(this, $"Requesting category data {refreshingLink}" + "...Done");
                     break;
                 default:
                     break;
-            }
+            } 
+            MyLog.Log(this, nameof(SwipeRefLayout_Refresh) + "...Done");
         }
 
         public void ArticalOverviewProcessedCallback(string uid, string url, ArticalOverview[] articalOverviews, OverviewType overviewType, string nextPageUrl)
         {
+            MyLog.Log(this, nameof(ArticalOverviewProcessedCallback));
             ArticalOverview[] newData = null;
             lock (NextPageRequestUids)
             {
 
                 if (NextPageRequestUids == uid)
                 {
+                    MyLog.Log(this, $"next page data received" + "...");
                     newData = new ArticalOverview[adapter.data.Length + articalOverviews.Length];
                     adapter.data.CopyTo(newData, 0);
                     articalOverviews.CopyTo(newData, adapter.data.Length);
 
-                    NextPageRequestUids = string.Empty;
+                    NextPageRequestUids = string.Empty; 
+                    MyLog.Log(this, $"next page data received" + "...Done");
                 }
             }
             if (nextPageUrl != null && nextPageUrl != string.Empty)
@@ -148,14 +177,19 @@ namespace Tax_Informer.Fragments
 
             if (uid == refreshingRequestUid)
             {
+                MyLog.Log(this, "refreshing content received" + "...");
                 newData = null;
                 refreshingRequestUid = string.Empty;
-                Activity.RunOnUiThread(new Action(() => { swipeRefLayout.Refreshing = false; }));
-            }            
+                Activity.RunOnUiThread(new Action(() => { swipeRefLayout.Refreshing = false; })); 
+                MyLog.Log(this, "refreshing content received" + "...Done");
+            }
 
+            MyLog.Log(this, "Updating adapter data" + "...");
             adapter.data = newData == null ? articalOverviews : newData;
             database.IsSeen(UidGenerator(), adapter.data);  //request a filter from DB
-            Activity.RunOnUiThread(responseUpdate);
+            Activity.RunOnUiThread(responseUpdate);  
+            MyLog.Log(this, "Updating adapter data" + "...Done");
+            MyLog.Log(this, nameof(ArticalOverviewProcessedCallback) + "...Done");
         }
 
         private void responseUpdate()
@@ -165,8 +199,11 @@ namespace Tax_Informer.Fragments
 
         public void LoadNextPage()
         {
+            
             if (NextPageRequestUids != string.Empty) return;    //their is a pending request for next page
             if (nextPageContext == null) return;
+
+            MyLog.Log(this, nameof(LoadNextPage) + "...");
             string uid = UidGenerator();
             var obj = nextPageContext.createObj();
             NextPageRequestUids = uid;   //hold the uid of request 
@@ -177,17 +214,24 @@ namespace Tax_Informer.Fragments
                 case OverviewType.UNKNOWN:
                     break;
                 case OverviewType.IndexPage:
-                    analysisModule.ReadIndexPage(uid, websiteKey, nextPageContext.url, this);
+                    MyLog.Log(this, $"Requesting index page data {nextPageContext.url}" + "...");
+                    analysisModule.ReadIndexPage(uid, websiteKey, nextPageContext.url, this); 
+                    MyLog.Log(this, $"Requesting index page data {nextPageContext.url}" + "...Done");
                     break;
                 case OverviewType.Author:
-                    analysisModule.ReadAuthor(uid, websiteKey, obj as Author, this);
+                    MyLog.Log(this, $"Requesting author data {nextPageContext.url}" + "...");
+                    analysisModule.ReadAuthor(uid, websiteKey, obj as Author, this); 
+                    MyLog.Log(this, $"Requesting author data {nextPageContext.url}" + "...Done");
                     break;
                 case OverviewType.Category:
-                    analysisModule.ReadCategory(uid, websiteKey, obj as Category, this);
+                    MyLog.Log(this, $"Requesting Category data {nextPageContext.url}" + "...");
+                    analysisModule.ReadCategory(uid, websiteKey, obj as Category, this); 
+                    MyLog.Log(this, $"Requesting Category data {nextPageContext.url}" + "...Done");
                     break;
                 default:
                     break;
-            }
+            } 
+            MyLog.Log(this, nameof(LoadNextPage) + "...Done");
         }
 
         private class RecyclerViewAdpater : RecyclerView.Adapter

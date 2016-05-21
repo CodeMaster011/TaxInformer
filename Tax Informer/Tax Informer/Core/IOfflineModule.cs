@@ -29,8 +29,10 @@ namespace Tax_Informer.Core
 
         public void RequestData(RequestPacket requestPacket, IResponseHandler responseHandler)
         {
+            MyLog.Log(this, nameof(RequestData) + requestPacket.Url + "...");
             requestPacket.OfflineModuleResponse = responseHandler;
-            pendingRequest.Enqueue(requestPacket);
+            pendingRequest.Enqueue(requestPacket); 
+            MyLog.Log(this, nameof(RequestData) + requestPacket.Url + "...Done");
         }
 
         public void RequestProcessedCallback(RequestPacket requestPacket)
@@ -42,62 +44,91 @@ namespace Tax_Informer.Core
         {
             while (IsRunning)
             {
-                if (cancleRequest.Count > 0)
+                try
                 {
-                    onlineModule.CancleRequest(cancleRequest.Dequeue());
-                }
-
-                if (pendingRequest.Count > 0)
-                {
-                    var reqPacket = pendingRequest.Dequeue();
-                    var reqURL = reqPacket.Url;
-
-                    var resultStr = diskCache.GetString(reqURL);
-                    if (resultStr == string.Empty || reqPacket.OnlyOnline)
+                    if (cancleRequest.Count > 0)
                     {
-                        //no data in disk download now
-                        onlineModule.RequestData(reqPacket, this);
+                        onlineModule.CancleRequest(cancleRequest.Dequeue());
                     }
-                    else
+
+                    if (pendingRequest.Count > 0)
                     {
-                        //TODO: Create a delayed queue for handling refreshing existing data
-                        onlineModule.RequestData(reqPacket.Clone() as RequestPacket, this); //refresh data
+                        var reqPacket = pendingRequest.Dequeue();
+                        var reqURL = reqPacket.Url;
 
-                        //data exist in cache
-                        reqPacket.DataInString = resultStr;   //add result
-                        pendingResponse.Enqueue(reqPacket); //add to response queue                                    
-                    }                    
-                }
-
-                if (pendingResponse.Count > 0)
-                {
-                    var responsePacket = pendingResponse.Dequeue();
-
-                    var responseHandler = responsePacket.OfflineModuleResponse;
-
-                    if (responsePacket.requestObjs.ContainsKey(RequestPacket.RequestPacketOnlineModuleResponse))  
-                    {
-                        //the response package is coming from IOnlineModule
-
-                        var packUrl = responsePacket.Url;
-
-                        if (diskCache.IsKeyExist(packUrl) && !responsePacket.OnlyOnline)
+                        MyLog.Log(this, $"Request processing {reqPacket.Url}" + "...");
+                        var resultStr = diskCache.GetString(reqURL);
+                        if (resultStr == string.Empty || reqPacket.OnlyOnline)
                         {
-                            diskCache.Put(packUrl, responsePacket.DataInString, true);
-                            responsePacket.Dispose();
+                            //no data in disk download now
+                            MyLog.Log(this, "no data on disk requesting to download" + "...");
+                            onlineModule.RequestData(reqPacket, this); 
+                            MyLog.Log(this, "no data on disk requesting to download" + "...Done");
                         }
                         else
                         {
-                            diskCache.Put(packUrl, responsePacket.DataInString, true);
-                            responseHandler.RequestProcessedCallback(responsePacket); //make callback
-                        }
+                            //TODO: Create a delayed queue for handling refreshing existing data
+                            MyLog.Log(this, "data is on the disk. A refreshing request is sent." + "...");
+                            onlineModule.RequestData(reqPacket.Clone() as RequestPacket, this); //refresh data  
+                            MyLog.Log(this, "data is on the disk. A refreshing request is sent." + "...Done");
+
+                            //data exist in cache
+                            reqPacket.DataInString = resultStr;   //add result
+                            pendingResponse.Enqueue(reqPacket); //add to response queue            
+                        } 
+                        MyLog.Log(this, $"Request processing {reqPacket.Url}" + "...Done");
                     }
-                    else
+
+                    if (pendingResponse.Count > 0)
                     {
-                        //data has been retrieved from cache
-                        responseHandler.RequestProcessedCallback(responsePacket); //make callback
+                        var responsePacket = pendingResponse.Dequeue();
+
+                        MyLog.Log(this, $"Response processing url {responsePacket.Url}" + "...");
+                        var responseHandler = responsePacket.OfflineModuleResponse;
+
+                        if (responsePacket.requestObjs.ContainsKey(RequestPacket.RequestPacketOnlineModuleResponse))
+                        {
+                            //the response package is coming from IOnlineModule
+
+                            var packUrl = responsePacket.Url;
+
+                            MyLog.Log(this, "response is coming from online" + "...");
+                            
+                            if (!string.IsNullOrEmpty(responsePacket.DataInString) && diskCache.IsKeyExist(packUrl) && !responsePacket.OnlyOnline)
+                            {
+                                MyLog.Log(this, "Data was exist. Refreshing disk data" + "...");
+                                diskCache.Put(packUrl, responsePacket.DataInString, true);
+                                responsePacket.Dispose(); 
+                                MyLog.Log(this, "Data was exist. Refreshing disk data" + "...Done");
+                            }
+                            else if (string.IsNullOrEmpty(responsePacket.DataInString))
+                            {
+                                MyLog.Log(this, "Response for non-string data" + "...");
+                                responseHandler.RequestProcessedCallback(responsePacket); //make callback  
+                                MyLog.Log(this, "Response for non-string data" + "...Done");
+                            }
+                            else
+                            {
+                                MyLog.Log(this, "No Data on disk. Dumping data to disk and callback is made" + "...");
+                                diskCache.Put(packUrl, responsePacket.DataInString, true);
+                                responseHandler.RequestProcessedCallback(responsePacket); //make callback  
+                                MyLog.Log(this, "No Data on disk. Dumping data to disk and callback is made" + "...Done");
+                            } 
+                            MyLog.Log(this, "response is coming from online" + "...Done");
+                        }
+                        else
+                        {
+                            //data has been retrieved from cache
+                            responseHandler.RequestProcessedCallback(responsePacket); //make callback
+                        } 
+                        MyLog.Log(this, $"Response processing url {responsePacket.Url}" + "...Done");
                     }
                 }
+                catch (Exception ex)
+                {
+                    MyLog.Log(this, "--Error " + ex.Message);
+                }
+                
                 Thread.Sleep(1);
             }
         }
