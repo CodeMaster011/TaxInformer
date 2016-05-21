@@ -74,10 +74,10 @@ namespace Tax_Informer
         public static void StartActivityArtical(Context context, ArticalOverview overview, string websiteKey, bool isOfflineArtical = false)
         {
             var b = overview.ToBundle();
-            Intent intent = new Intent(context, typeof(Activities.ArticalActivity));
-            intent.PutExtra(Activities.ArticalActivity.PassArticalOverviewObj, b );
-            intent.PutExtra(Activities.ArticalActivity.PassWebsiteKey, websiteKey);
-            intent.PutExtra(Activities.ArticalActivity.PassIsOffline, isOfflineArtical);
+            Intent intent = new Intent(context, typeof(Activities.ArticalActivityV2));
+            intent.PutExtra(Activities.ArticalActivityV2.PassArticalOverviewObj, b );
+            intent.PutExtra(Activities.ArticalActivityV2.PassWebsiteKey, websiteKey);
+            intent.PutExtra(Activities.ArticalActivityV2.PassIsOffline, isOfflineArtical);
             context.StartActivity(intent);
         }
         public static void StartActivityOffline(Context context)

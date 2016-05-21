@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\ArticalActivity.cs" />
+    <Compile Include="Activities\ArticalActivityV2.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\OfflineActivity.cs" />
     <Compile Include="Activities\OverviewActivity.cs" />
@@ -149,7 +150,7 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\artical.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\artical_relatedpost_single_item.axml">
       <SubType>AndroidResource</SubType>
@@ -172,8 +173,11 @@
     <AndroidResource Include="Resources\layout\overview_cat_single_item.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\temp.axml">
-      <SubType>AndroidResource</SubType>
+    <AndroidResource Include="Resources\layout\artical_layout_v2_title_bar.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\artical_layout_v2.axml">
+      <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
