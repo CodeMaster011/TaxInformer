@@ -64,16 +64,20 @@ namespace Tax_Informer.Activities
 
             if (string.IsNullOrEmpty(artical.ExternalFileLink))
             {
-                MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...");
-                articalContentTextview.Gravity = GravityFlags.Left;
-                articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
-                articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
+                //MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...");
+                //articalContentTextview.Gravity = GravityFlags.Left;
+                //articalContentTextview.TextFormatted = Android.Text.Html.FromHtml(artical.HtmlText);//TODO: Add an image getter for getting images from web. Use Picasso to download image and use custom memory cache.
+                //articalContentTextview.GetFocusedRect(new Android.Graphics.Rect(0, 0, 1, 1));
 
-                adapter.NotifyDataSetChanged();
+                //adapter.NotifyDataSetChanged();
 
-                articalContentTextview.Visibility = ViewStates.Visible;
-                if (articalContentWebview != null) articalContentWebview.Visibility = ViewStates.Gone; 
-                MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...Done");
+                //articalContentTextview.Visibility = ViewStates.Visible;
+                //if (articalContentWebview != null) articalContentWebview.Visibility = ViewStates.Gone; 
+                //MyLog.Log(this, $"Updating artical data text url {artical.MyLink} " + "...Done");
+
+                articalContentWebview.LoadData(artical.HtmlText, "text/html", "utf-8");
+                articalContentTextview.Visibility = ViewStates.Gone;
+                articalContentWebview.Visibility = ViewStates.Visible;
             }
             else
             {
