@@ -61,4 +61,23 @@ namespace Tax_Informer.Core
             nextPageUrl = null; return null;
         }
     }
+
+    [System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    sealed class WebsiteAttribute : Attribute
+    {
+        readonly string websiteKey;
+
+        public WebsiteAttribute(string websiteKey)
+        {
+            this.websiteKey = websiteKey;
+        }
+
+        public string WebsiteKey
+        {
+            get
+            {
+                return websiteKey;
+            }
+        }
+    }
 }
