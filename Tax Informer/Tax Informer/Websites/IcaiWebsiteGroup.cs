@@ -14,6 +14,7 @@ using Tax_Informer.Core;
 
 namespace Tax_Informer.Websites
 {
+    [Website("A4A59C21-B237-4E6C-A530-382580F9AD12")]
     class IcaiWebsiteGroup : WebsiteGroup
     {
         private const string webDir = "http://www.icai.org/";

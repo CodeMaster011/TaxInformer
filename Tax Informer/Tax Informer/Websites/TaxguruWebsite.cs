@@ -14,6 +14,7 @@ using Tax_Informer.Core;
 
 namespace Tax_Informer.Websites
 {
+    [Website("7238BEE9-E236-4340-A2BA-D59B95956F06")]
     internal class TaxguruWebsite : Website
     {
         public override string ComicText { get; } = "Tg";

@@ -14,6 +14,7 @@ using Tax_Informer.Core;
 
 namespace Tax_Informer.Websites
 {
+    [Website("E0479F9D-6C52-42F3-83FB-B08614452DE4")]
     internal class CharteredClubWebsite : Website
     {
         public override string Color { get; } = "#AB47BC";//400
