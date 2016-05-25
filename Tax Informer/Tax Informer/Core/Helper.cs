@@ -4,6 +4,7 @@ using Java.Net;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -217,7 +218,89 @@ namespace Tax_Informer
             }
             return result;
         }
-        
+
+        public static string DownloadFileWithPostRequest(string url, string postParameters, string userAgent = "chrome")
+        {
+            try
+            {
+                var stream = DownloadFileWithPostRequestInMemory(url, postParameters, userAgent);
+                StreamReader responseReader = new StreamReader(stream);
+                string fullResponse = responseReader.ReadToEnd();
+                stream.Close();
+
+                return fullResponse;
+            }
+            catch (Exception ex)
+            {                
+                throw ex;
+            }            
+        }
+        public static Stream DownloadFileWithPostRequestInMemory(string url, string postParameters, string userAgent = "chrome")
+        {
+            try
+            {
+                Dictionary<string, object> _postParameters = new Dictionary<string, object>();//TODO: Convert the string to parameters
+
+                HttpWebResponse webResponse = FormUpload.MultipartFormDataPost(url, userAgent, _postParameters);
+
+                return webResponse.GetResponseStream();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static string CreatePostRequest(string postUrl, Dictionary<string, string> parmeters, string contentType = "multipart/form-data;", string userAgent = "chrome")
+        {
+            string paramData = "";
+            foreach (var p in parmeters)            
+                paramData += $"{p.Key}={p.Value}&";
+            paramData = paramData.Substring(0, paramData.Length - 1);
+
+            return StringSequentialSerilizer("post", postUrl, contentType, userAgent, paramData);
+        }
+
+        public static string ConvertDirectoryToString(Dictionary<string,object> directory)
+        {
+            string paramData = "";
+            foreach (var p in directory)
+                paramData += $"{p.Key}={p.Value}&";
+            return paramData.Substring(0, paramData.Length - 1);
+        }
+
+        public static Dictionary<string, object> ConvertStringToDirectory(string value)
+        {
+            var ss = value.Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            foreach (var item in ss)
+            {
+                var ddd = item.Split('=');
+                result.Add(ddd[0], ddd[1]);
+            }
+            return result.Keys.Count > 0 ? result : null;
+        }
+        public static string StringSequentialSerilizer(params string[] contents)
+        {
+            string result = "";
+            foreach (var item in contents)
+                result += $"{item.Length.ToString("000")}{item}";
+            return result;
+        }
+
+        public static string[] StringSequentialDeserilizer(string serilizedData)
+        {
+            List<string> result = new List<string>();
+            for (int i = 0; i < serilizedData.Length; i++)
+            {
+                var dataLength = int.Parse(serilizedData.Substring(i, 3));
+                var data = serilizedData.Substring(i + 3, dataLength);
+                result.Add(data);
+
+                i += 3 + dataLength - 1;                
+            }
+            return result.Count > 0 ? result.ToArray() : null;
+        }
 
         public static bool DumpDataToFile(string data, string desPath)
         {
@@ -436,6 +519,119 @@ namespace Tax_Informer
             return $"{baseUrl ?? ""}{other ?? ""}";
         }
     }
+
+    public static class FormUpload
+    {
+        private static readonly Encoding encoding = Encoding.UTF8;
+        public static HttpWebResponse MultipartFormDataPost(string postUrl, string userAgent, Dictionary<string, object> postParameters)
+        {
+            string formDataBoundary = String.Format("----------{0:N}", Guid.NewGuid());
+            string contentType = "multipart/form-data; boundary=" + formDataBoundary;
+
+            byte[] formData = GetMultipartFormData(postParameters, formDataBoundary);
+
+            return PostForm(postUrl, userAgent, contentType, formData);
+        }
+        private static HttpWebResponse PostForm(string postUrl, string userAgent, string contentType, byte[] formData)
+        {
+            HttpWebRequest request = WebRequest.Create(postUrl) as HttpWebRequest;
+
+            if (request == null)
+            {
+                throw new NullReferenceException("request is not a http request");
+            }
+
+            // Set up the request properties.
+            request.Method = "POST";
+            request.ContentType = contentType;
+            request.UserAgent = userAgent;
+            request.CookieContainer = new CookieContainer();
+            request.ContentLength = formData.Length;
+
+            // You could add authentication here as well if needed:
+            // request.PreAuthenticate = true;
+            // request.AuthenticationLevel = System.Net.Security.AuthenticationLevel.MutualAuthRequested;
+            // request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.Default.GetBytes("username" + ":" + "password")));
+
+            // Send the form data to the request.
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(formData, 0, formData.Length);
+                requestStream.Close();
+            }
+
+            return request.GetResponse() as HttpWebResponse;
+        }
+
+        private static byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
+        {
+            Stream formDataStream = new System.IO.MemoryStream();
+            bool needsCLRF = false;
+
+            foreach (var param in postParameters)
+            {
+                // Thanks to feedback from commenters, add a CRLF to allow multiple parameters to be added.
+                // Skip it on the first parameter, add it to subsequent parameters.
+                if (needsCLRF)
+                    formDataStream.Write(encoding.GetBytes("\r\n"), 0, encoding.GetByteCount("\r\n"));
+
+                needsCLRF = true;
+
+                if (param.Value is FileParameter)
+                {
+                    FileParameter fileToUpload = (FileParameter)param.Value;
+
+                    // Add just the first part of this param, since we will write the file data directly to the Stream
+                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n",
+                        boundary,
+                        param.Key,
+                        fileToUpload.FileName ?? param.Key,
+                        fileToUpload.ContentType ?? "application/octet-stream");
+
+                    formDataStream.Write(encoding.GetBytes(header), 0, encoding.GetByteCount(header));
+
+                    // Write the file data directly to the Stream, rather than serializing it to a string.
+                    formDataStream.Write(fileToUpload.File, 0, fileToUpload.File.Length);
+                }
+                else
+                {
+                    string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}",
+                        boundary,
+                        param.Key,
+                        param.Value);
+                    formDataStream.Write(encoding.GetBytes(postData), 0, encoding.GetByteCount(postData));
+                }
+            }
+
+            // Add the end of the request.  Start with a newline
+            string footer = "\r\n--" + boundary + "--\r\n";
+            formDataStream.Write(encoding.GetBytes(footer), 0, encoding.GetByteCount(footer));
+
+            // Dump the Stream into a byte[]
+            formDataStream.Position = 0;
+            byte[] formData = new byte[formDataStream.Length];
+            formDataStream.Read(formData, 0, formData.Length);
+            formDataStream.Close();
+
+            return formData;
+        }
+
+        public class FileParameter
+        {
+            public byte[] File { get; set; }
+            public string FileName { get; set; }
+            public string ContentType { get; set; }
+            public FileParameter(byte[] file) : this(file, null) { }
+            public FileParameter(byte[] file, string filename) : this(file, filename, null) { }
+            public FileParameter(byte[] file, string filename, string contenttype)
+            {
+                File = file;
+                FileName = filename;
+                ContentType = contenttype;
+            }
+        }
+    }
+
     public class SearchCritriaBuilder
     {
         private SearchCritria critria = new SearchCritria();
@@ -479,5 +675,51 @@ namespace Tax_Informer
     {
         public string Name { get; set; } = null;
         public Dictionary<string, string> Attribute { get; set; } = null;
+    }
+
+    public class PostRequestBuilder
+    {
+        public string PostUrl { get; protected set; } = null;
+        public Dictionary<string, object> Params { get; protected set; } = null;
+        public string ContentType { get; protected set; } = "multipart/form-data;";
+        public string UserAgent { get; protected set; } = "chrome";
+
+        private PostRequestBuilder() { }
+
+        public static PostRequestBuilder New(string postUrl) => new PostRequestBuilder() { PostUrl = postUrl };
+
+        
+        public PostRequestBuilder AddPrams(string key,string value)
+        {
+            Params.Add(key, value);
+            return this;
+        }
+        public PostRequestBuilder SetContentType(string contentType)
+        {
+            this.ContentType = contentType;
+            return this;
+        }
+        public PostRequestBuilder SetUserAgent(string userAgent)
+        {
+            this.UserAgent = userAgent;
+            return this;
+        }
+        public string Build()
+        {
+            var paramString = Helper.ConvertDirectoryToString(Params);
+            return Helper.StringSequentialSerilizer("post", PostUrl, ContentType, UserAgent, paramString);
+        }
+        public static PostRequestBuilder FromSerilizedData(string serilizedData)
+        {
+            var data = Helper.StringSequentialDeserilizer(serilizedData);
+            var parms = Helper.ConvertStringToDirectory(data[4]);
+            return new PostRequestBuilder()
+            {
+                Params = parms,
+                PostUrl = data[1],
+                ContentType = data[2],
+                UserAgent = data[3]
+            };
+        }
     }
 }
